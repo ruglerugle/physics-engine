@@ -139,7 +139,8 @@
       cv.addEventListener("pointerdown", function (e) { down = true; sx = e.clientX; sy = e.clientY; y0 = cam.yaw; p0 = cam.pitch; cv.setPointerCapture(e.pointerId); });
       cv.addEventListener("pointermove", function (e) {
         if (!down) return;
-        cam.yaw = y0 - (e.clientX - sx) * 0.5; cam.pitch = Math.max(-10, Math.min(85, p0 + (e.clientY - sy) * 0.4));
+        // 手前の面がポインタについてくる向き
+        cam.yaw = y0 + (e.clientX - sx) * 0.5; cam.pitch = Math.max(-10, Math.min(85, p0 + (e.clientY - sy) * 0.4));
         st.redraw();
       });
       cv.addEventListener("pointerup", function () { down = false; });
