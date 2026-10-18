@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE6 空中の重心（重心と放物線） ― チート900を数式で動かす</title>
+<meta name="description" content="体の各部分の重さで平均した点が重心。シーソーのつり合いから重みつき平均を導き、チート900の重心を計算する。空中では重心が放物線を描くこと、離陸と着地の2点から放物線を1本に決めて体の位置を直す方法、跳ぶ高さと滞空時間の計算まで。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage6">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE6 空中の重心（重心と放物線） ― チート900を数式で動かす">
+<meta property="og:description" content="体の重さで平均した重心と、空中の放物線。離陸と着地から放物線を決めて体の位置を直す方法と、跳ぶ高さ・滞空時間の計算。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage6">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE6 空中の重心",
+      "description": "体の各部分の重さで平均した点が重心。シーソーのつり合いから重みつき平均を導き、チート900の重心を計算する。空中では重心が放物線を描くこと、離陸と着地の2点から放物線を1本に決めて体の位置を直す方法、跳ぶ高さと滞空時間の計算まで。",
+      "url": "https://physics-engine.habatakijuku.com/stage6",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 6,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE6 空中の重心",
+          "item": "https://physics-engine.habatakijuku.com/stage6"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 6 ― 空中の重心 ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 6</span><h1 class="chapter-title">空中の重心</h1>
+        <div class="chapter-sub">重心と放物線</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">体の各部分の重さで平均する<strong>重心</strong>を計算し、空中では重心が<strong>放物線</strong>を描くことを式で説明しよう。離陸と着地の重心から放物線を1本に決める方法と、離陸の速さから跳ぶ高さを出す方法を身につければ合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">ステージ1で、空中では「体全体の重さで平均した位置」、つまり<strong>重心</strong>が、重力加速度 9.8 m/s² で落ちることを確かめた。今日は、その重心をどう計算するか、そして空中で重心が描く<strong>放物線</strong>を、どうやってアニメーションに守らせたかを話そう。まずは簡単な例からだ。長さ 3 m の軽い板の左はしに 2 kg、右はしに 1 kg のおもりを載せる。どこを支えればつり合うと思う？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">重いほうに近い所です。てこの原理で、「おもりの重さ × 支点からの距離」が左右で等しくなる所ですよね。支点が左はしから a m の所なら、2 × a ＝ 1 × (3 − a) なので、3a ＝ 3、a ＝ 1 m です。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。この式を一般の形に直してみよう。重さ m₁ のおもりが位置 x₁、重さ m₂ が位置 x₂ にあるとき、つり合う位置 X は m₁(X − x₁) ＝ m₂(x₂ − X) から、<br><strong>X ＝ (m₁x₁ ＋ m₂x₂) ÷ (m₁ ＋ m₂)</strong><br>「位置に重さを掛けて足し、重さの合計で割る」。これを<strong>重みつき平均</strong>といい、つり合う点が<strong>重心</strong>だ。おもりがいくつあっても、3次元でも、x・y・z それぞれで同じ計算をすればいい。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">体の重心も、体をいくつかの部分に分けて、同じように計算するんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだ。このアニメーションでは、体を胴・頭・太もも・すね・足・上腕・前腕・手に分け、それぞれの重さの割合を、人の体を測った研究の値に近いものにしている。胴が 43、頭が 8、太ももが片方 10、すねが 4.5、足が 1.5、上腕が 2.8、前腕が 1.6、手が 0.6 という割合だ。それぞれの部分の位置は、骨の両はしの真ん中（胴は両肩と両股関節の4点の平均）とする。下の図で、体の形が変わると重心がどこへ動くか見てごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="チート900の体の各部分の重さを円の大きさで表し、重みつき平均の重心をピンクの点で表示。コマを動かすと重心が動く。脚を重くするボタンで重心の位置の変わり方を見る"></canvas></div>
+        <div class="sim-controls">
+          <label>コマ <input type="range" id="k1" min="0" max="161" value="79" step="1"> <output id="k1o"></output></label>
+          <button class="sim-play" id="play1" type="button" aria-pressed="false">▶ 再生</button>
+        </div>
+        <div class="sim-controls" id="wt1">
+          <button class="btn" type="button" data-w="1" aria-pressed="true">ふつうの重さ</button>
+          <button class="btn" type="button" data-w="3" aria-pressed="false">脚を3倍に重くする</button>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">茶色の円が各部分の位置（円の大きさが重さの割合）、ピンクの点が重心、点線は重心から床へ下ろした線。インパクト（1.32 秒）では蹴り脚が高く伸びているので、重心は胴の中心より蹴り脚の側へずれる。「脚を3倍に重くする」と、重心が脚のほうへ大きく引っぱられる。図はドラッグで回せる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">体を大きく曲げていると、重心が体の外に出ることもあるんですね。インパクトのときは、蹴り脚のほうへ寄っています。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">走り高跳びの背面跳びでは、体を大きく反らせて重心をバーの下に通すことさえある。さて、ここからが本題だ。空中では、重心はどんな道すじを通るだろう。ステージ1で見たことを思い出してごらん。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">空中では、重心の上下の加速度はずっと −9.8 m/s² でした。横の向き（水平）には体を押すものが何もないので、水平の速さは変わらないはずです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。離陸の瞬間の重心の高さを y₀、上向きの速さを v₀ とすると、t 秒後の上向きの速さは v₀ − 9.8t。速さが一定の割合で変わるとき、進む距離は「最初と最後の速さの平均 × 時間」で出せるから、高さは<br><strong>y(t) ＝ y₀ ＋ v₀t − ½ × 9.8 × t²</strong><br>水平は速さが一定だから、x(t) ＝ x₀ ＋ (水平の速さ) × t。この2つを合わせた道すじが<strong>放物線</strong>だ。手足をどう動かしても、重心はこの放物線から外れられない。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">½ × 9.8 × t² のところ、確かめてみます。最初の速さが v₀、t 秒後が v₀ − 9.8t なので、平均は (v₀ ＋ v₀ − 9.8t) ÷ 2 ＝ v₀ − 4.9t。それに時間 t を掛けると v₀t − 4.9t²。4.9 は 9.8 の半分なので、ちゃんと合っています。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">いいね。ところで、アニメーションを作っていると、手足の形を直したり、動画に合わせたりするたびに、空中の重心がこの放物線から少しずつずれてしまう。そこで毎回、<strong>放物線に戻す計算</strong>をした。離陸のコマの重心と、着地のコマの重心は、床の動きとつながっているので動かせない。空中の時間を T とすると、この2点を通る放物線は1本に決まる。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">2つの点を通る放物線は、たくさんありませんか？ 上に大きくふくらむものも、低いものも描けそうです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">ふつうの放物線ならそうだ。でも今は、t² の前の数が −4.9 と決まっている。決まっていないのは v₀ と水平の速さだけだ。着地の高さ y₁ ＝ y₀ ＋ v₀T − 4.9T² から、<strong>v₀ ＝ (y₁ − y₀ ＋ 4.9T²) ÷ T</strong>。水平の速さは (着地の位置 − 離陸の位置) ÷ T。どちらも1つに決まるから、放物線も1本に決まる。あとは空中の各コマで、重心を放物線の上へ戻すように、<strong>体全体を平行移動</strong>する。体の形は変えないから、手足の動きはそのままだ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="空中の重心の高さ。ずれた道すじ（灰色）と、離陸と着地の2点を通る重力の放物線（ピンク）。矢印は各コマで体を動かす量"></canvas></div>
+        <div class="sim-controls">
+          <label>空中の重心のずれ <input type="range" id="bump2" min="-0.1" max="0.1" value="0.05" step="0.005"> <output id="bump2o"></output></label>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">横軸は空中の時間、縦軸は重心の高さ。灰色は、手足の形を直したあとに放物線からずれてしまった重心（ずれの大きさはスライダーで変えられる）。ピンクは離陸と着地の2点を通る「t² の前が −4.9」の放物線。矢印のぶんだけ、各コマで体全体を上下に動かす</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">離陸と着地さえ決まれば、空中の重心の道すじは全部決まってしまうんですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">だからこそ、どれだけ高く跳べるかは、離陸の瞬間にもう決まっている。いちばん高い所では上向きの速さが 0 になるから、v₀ − 9.8t ＝ 0 より t ＝ v₀ ÷ 9.8 秒後。そのときの上がった高さは v₀t − 4.9t² ＝ <strong>v₀² ÷ (2 × 9.8)</strong>。このチート900は、上向き約 2.6 m/s、水平 約 1.8 m/s で離陸して、重心は約 0.35 m 上がり、約 0.52 秒で着地する。その間に水平に約 0.93 m 進む。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">前に「ステップが遅いと、こんなに跳べるとは思えない」と直したのは、このことと関係がありますか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">大いに関係がある。上向きの速さは、最後の一歩で床を強く蹴って作るが、それまでのステップで体がもっている前向きの勢いも、踏み込んだ脚で上向きに変えて使う。ステップがゆっくりだと、その勢いが足りず、見た人に「あれでは跳べない」と感じさせる。そこで、構えから踏み切りまでの時間を詰めて、ステップ中の重心の速さを毎秒約 1.3 m から約 2 m に上げた。空中の放物線は変えずに、地面の上の動きだけを速くしたんだ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="離陸の速さ（上向き・水平）から、重心の放物線、いちばん高い所、同じ高さに戻るまでの時間と距離を計算する"></canvas></div>
+        <div class="sim-controls">
+          <label>上向きの速さ v₀ <input type="range" id="vy3" min="1" max="4" value="2.6" step="0.05"> <output id="vy3o"></output></label>
+          <label>水平の速さ <input type="range" id="vx3" min="0" max="4" value="1.8" step="0.05"> <output id="vx3o"></output></label>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">離陸の速さを決めると、重心の放物線が1本に決まる。黒い点線はチート900の実際の重心の道すじ（離陸〜着地）。上がる高さは v₀² ÷ 19.6、同じ高さに戻るまでの時間は 2v₀ ÷ 9.8</div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">重心＝重みつき平均：<span class="nw">X ＝ (m₁x₁ ＋ m₂x₂ ＋ …) ÷ (m₁ ＋ m₂ ＋ …)</span>（x・y・z それぞれ）。体は胴・頭・手足の部分に分けて計算する</span>
+        <span class="step">空中では水平の速さは一定、上向きの速さは毎秒 9.8 m/s ずつ減る：<span class="nw">y(t) ＝ y₀ ＋ v₀t − 4.9t²</span>（放物線）。手足をどう動かしても重心は外れられない</span>
+        <span class="step">離陸と着地の重心から放物線は1本に決まる：<span class="nw">v₀ ＝ (y₁ − y₀ ＋ 4.9T²) ÷ T</span>。空中の各コマで体全体を平行移動して放物線に戻す</span>
+        <span class="step">上がる高さ <span class="nw">v₀² ÷ (2 × 9.8)</span>。チート900：上向き約 2.6 m/s で約 0.35 m 上がり、約 0.52 秒で着地</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 位置 x＝0 に 2 kg、x＝3 に 1 kg のおもりがある。重心の位置は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">x ＝ 1.5</button>
+          <button class="choice-btn">x ＝ 2</button>
+          <button class="choice-btn">x ＝ 1</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ (2 × 0 ＋ 1 × 3) ÷ (2 ＋ 1) ＝ 3 ÷ 3 ＝ 1。重いおもりに近い所でつり合う。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 上向き 2.5 m/s で離陸すると、重心はおよそ何 m 上がる？（重力加速度 9.8 m/s²）</p>
+        <div class="choice-list">
+          <button class="choice-btn">約 0.13 m</button>
+          <button class="choice-btn">約 0.32 m</button>
+          <button class="choice-btn">約 0.64 m</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ v₀² ÷ (2 × 9.8) ＝ 6.25 ÷ 19.6 ≈ 0.32 m。速さが2倍になると、高さは4倍になる。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 空中で腕や脚を大きく動かすと、重心の道すじはどうなる？</p>
+        <div class="choice-list">
+          <button class="choice-btn">変わらない（重心は放物線のまま）</button>
+          <button class="choice-btn">腕を振り上げれば、重心を持ち上げられる</button>
+          <button class="choice-btn">脚を伸ばすと、重心が遠くへ飛ぶ</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 空中では重力のほかに体を押す力がないので、重心は放物線から外れられない。腕を上げれば体のほかの部分が下がり、重心の位置は変わらない。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(6);</script>
+<script>
+/* ---------- 重心の計算（重さを変えられる） ---------- */
+function comW(p,legMul){
+  var s=[0,0,0],m=0;
+  PE.SEG.forEach(function(g){
+    var w=g[4]*((/^(hip|knee|heel)/.test(g[0])&&!g[2])?legMul:1);
+    if(g[2]){[g[0],g[1],g[2],g[3]].forEach(function(n){s=PE.add(s,PE.mul(p[n],w/4));});} else s=PE.add(s,PE.mul(PE.mid(p[g[0]],p[g[1]]),w));
+    m+=w;
+  });
+  return PE.mul(s,1/m);
+}
+/* ---------- シミュレータ1：重みつき平均 ---------- */
+(function(){
+  var k=79, mul=1, st, cam;
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var p=PE.pose(k), c=comW(p,mul); cam.target=[c[0],Math.max(0.85,c[1]),c[2]];
+    PE.floor(ctx,cam,c[0]-2,c[0]+2,-1.5,1.5,0.5);
+    PE.drawBody(ctx,cam,p,{alpha:0.5});
+    PE.SEG.forEach(function(g){
+      var pos=g[2]?PE.mul(PE.add(PE.add(p[g[0]],p[g[1]]),PE.add(p[g[2]],p[g[3]])),0.25):PE.mid(p[g[0]],p[g[1]]);
+      var w=g[4]*((/^(hip|knee|heel)/.test(g[0])&&!g[2])?mul:1), q=cam.proj(pos);
+      ctx.fillStyle='rgba(138,106,47,.45)'; ctx.beginPath(); ctx.arc(q.x,q.y,2+Math.sqrt(w)*20,0,PE.TAU); ctx.fill();
+    });
+    var C=cam.proj(c), F=cam.proj([c[0],0,c[2]]);
+    ctx.strokeStyle=PE.C.com; ctx.setLineDash([4,4]); ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(C.x,C.y); ctx.lineTo(F.x,F.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=PE.C.com; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(C.x,C.y,8,0,PE.TAU); ctx.fill(); ctx.stroke();
+    PE.text(ctx,C.x+12,C.y,'重心',PE.C.com,12.5,900,'left');
+    PE.text(ctx,10,16,'t = '+PE.fmt(k/PE.fps,3)+' 秒（コマ '+k+'）',PE.C.ink,12,900,'left');
+    document.getElementById('ro1').innerHTML='<span>重心 (x, y, z) = (<b>'+PE.fmt(c[0],2)+'</b>, <b>'+PE.fmt(c[1],2)+'</b>, <b>'+PE.fmt(c[2],2)+'</b>) m</span><span>腰の中心からのずれ = <b>'+PE.fmt(PE.len(PE.sub(c,PE.mid(p.hipR,p.hipL)))*100,0)+'</b> cm</span>';
+  }
+  st=PE.canvas('cv1',0.72,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:-25,pitch:14,dist:5,target:[0.8,0.9,0],scale:0.95});
+  var el=PE.bindRange('k1','k1o',function(v){return PE.fmt(v/PE.fps,2)+' 秒';},function(v){k=v;st.redraw();});
+  var ft=k; PE.player(document.getElementById('play1'),function(dt){ft=(ft+dt*PE.fps*0.4)%PE.N; el.set(Math.floor(ft));});
+  el.addEventListener('input',function(){ft=parseFloat(el.value);});
+  document.querySelectorAll('#wt1 .btn').forEach(function(b){b.addEventListener('click',function(){mul=parseFloat(b.getAttribute('data-w'));document.querySelectorAll('#wt1 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});st.redraw();});});
+  st.redraw();
+})();
+
+/* ---------- シミュレータ2：放物線に戻す ---------- */
+(function(){
+  var bump=0.05, st, a=Math.round(PE.M.events.takeoff*PE.fps), b=Math.round(PE.M.events.landL*PE.fps);
+  var Y=[]; for(var k=a;k<=b;k++) Y.push(PE.com(k)[1]);
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var T=(b-a)/PE.fps, n=b-a, L=48,R=W-14,Tp=18,B=H-30, lo=0.95, hi=1.55;
+    var X=function(i){return L+(R-L)*i/n;}, Yp=function(v){return B-(B-Tp)*(v-lo)/(hi-lo);};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var v=1.0;v<=1.5001;v+=0.1){ctx.beginPath();ctx.moveTo(L,Yp(v));ctx.lineTo(R,Yp(v));ctx.stroke();PE.text(ctx,L-6,Yp(v),PE.fmt(v,1),PE.C.muted,10,700,'right');}
+    for(var t=0;t<=T+1e-9;t+=0.1){ctx.beginPath();ctx.moveTo(X(t*PE.fps),Tp);ctx.lineTo(X(t*PE.fps),B);ctx.stroke();PE.text(ctx,X(t*PE.fps),B+12,PE.fmt(t,1)+'秒',PE.C.muted,10,700);}
+    var bad=Y.map(function(y,i){var s=i/n; return y+bump*Math.sin(Math.PI*s)*Math.sin(3*Math.PI*s+0.6)*1.6;});
+    var y0=bad[0], y1=bad[n], v0=(y1-y0+4.9*T*T)/T;
+    var par=bad.map(function(_,i){var tt=i/PE.fps; return y0+v0*tt-4.9*tt*tt;});
+    ctx.strokeStyle='#9a948a'; ctx.lineWidth=2.2; ctx.beginPath(); bad.forEach(function(y,i){if(i)ctx.lineTo(X(i),Yp(y)); else ctx.moveTo(X(i),Yp(y));}); ctx.stroke();
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=2.6; ctx.beginPath(); par.forEach(function(y,i){if(i)ctx.lineTo(X(i),Yp(y)); else ctx.moveTo(X(i),Yp(y));}); ctx.stroke();
+    var mx=0; for(var i=2;i<n;i+=3){ if(Math.abs(par[i]-bad[i])>0.004) PE.arrowPx(ctx,X(i),Yp(bad[i]),X(i),Yp(par[i]),PE.C.acc,1.6,6); mx=Math.max(mx,Math.abs(par[i]-bad[i])); }
+    [[0,y0,'離陸'],[n,y1,'着地']].forEach(function(e){ctx.fillStyle=PE.C.ink;ctx.beginPath();ctx.arc(X(e[0]),Yp(e[1]),4.5,0,PE.TAU);ctx.fill();PE.text(ctx,X(e[0])+(e[0]?-8:8),Yp(e[1])+14,e[2],PE.C.ink,11.5,900,e[0]?'right':'left');});
+    PE.text(ctx,L+4,Tp+6,'重心の高さ（m）',PE.C.ink,11.5,900,'left');
+    document.getElementById('ro2').innerHTML='<span>空中の時間 T = <b>'+PE.fmt(T,3)+'</b> 秒</span><span>v₀ = (y₁ − y₀ ＋ 4.9T²) ÷ T = <b>'+PE.fmt(v0,2)+'</b> m/s</span><span>体を動かす量（最大） = <b>'+PE.fmt(mx*100,1)+'</b> cm</span>';
+  }
+  st=PE.canvas('cv2',0.58,draw);
+  PE.bindRange('bump2','bump2o',function(v){return PE.fmt(v*100,1)+' cm';},function(v){bump=v;st.redraw();});
+})();
+
+/* ---------- シミュレータ3：跳ぶ高さと滞空時間 ---------- */
+(function(){
+  var vy=2.6, vx=1.8, st, a=Math.round(PE.M.events.takeoff*PE.fps), b=Math.round(PE.M.events.landL*PE.fps);
+  var C0=PE.com(a), real=[]; for(var k=a;k<=b;k++){var c=PE.com(k); real.push([Math.hypot(c[0]-C0[0],c[2]-C0[2]), c[1]-C0[1]]);}
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W/3.6,H/1.25), O={x:30,y:H-28}, P=function(x,y){return {x:O.x+x*s,y:O.y-y*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var x=0;x<=3.4;x+=0.5){var A=P(x,0),B=P(x,1.0);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();PE.text(ctx,A.x,A.y+12,PE.fmt(x,1)+'m',PE.C.muted,10,700);} for(var y=0;y<=1.0001;y+=0.25){A=P(0,y);B=P(3.4,y);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();}
+    var T=2*vy/9.8, hmax=vy*vy/19.6;
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=3; ctx.beginPath(); for(var i=0;i<=60;i++){var t=T*i/60, q=P(vx*t, vy*t-4.9*t*t); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);} ctx.stroke();
+    ctx.strokeStyle='#4d5966'; ctx.setLineDash([4,4]); ctx.lineWidth=2; ctx.beginPath(); real.forEach(function(r,i){var q=P(r[0],r[1]); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);}); ctx.stroke(); ctx.setLineDash([]);
+    var top=P(vx*vy/9.8,hmax); ctx.fillStyle=PE.C.com; ctx.beginPath(); ctx.arc(top.x,top.y,5,0,PE.TAU); ctx.fill(); PE.text(ctx,top.x,top.y-14,'いちばん高い所 ＋'+PE.fmt(hmax,2)+' m',PE.C.com,11.5,900);
+    PE.text(ctx,10,16,'横＝進んだ距離、縦＝離陸からの高さ（重心）',PE.C.muted,11.5,800,'left');
+    document.getElementById('ro3').innerHTML='<span>上がる高さ v₀² ÷ 19.6 = <b>'+PE.fmt(hmax,2)+'</b> m</span><span>同じ高さに戻るまで 2v₀ ÷ 9.8 = <b>'+PE.fmt(T,2)+'</b> 秒</span><span>その間に進む距離 = <b>'+PE.fmt(vx*T,2)+'</b> m</span>';
+  }
+  st=PE.canvas('cv3',0.5,draw);
+  PE.bindRange('vy3','vy3o',function(v){return PE.fmt(v,2)+' m/s';},function(v){vy=v;st.redraw();});
+  PE.bindRange('vx3','vx3o',function(v){return PE.fmt(v,2)+' m/s';},function(v){vx=v;st.redraw();});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE8 ならすと何が変わる（時間方向のフィルタ） ― チート900を数式で動かす</title>
+<meta name="description" content="動画から取った動きは毎コマ少しずつぶれている。前後のコマとの重みつき平均（移動平均・ガウスフィルタ）でぶれをならす方法と、その代わりに失うもの（とがった瞬間・遅れ・骨の長さ）、骨の長さを守るために「向き」だけをならす工夫を、チート900のデータで確かめる。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage8">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE8 ならすと何が変わる（時間方向のフィルタ） ― チート900を数式で動かす">
+<meta property="og:description" content="動画から取った動きのぶれを、前後のコマとの重みつき平均でならす。ならすと失うもの（ピーク・遅れ・骨の長さ）と、向きだけをならす工夫。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage8">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE8 ならすと何が変わる",
+      "description": "動画から取った動きは毎コマ少しずつぶれている。前後のコマとの重みつき平均（移動平均・ガウスフィルタ）でぶれをならす方法と、その代わりに失うもの（とがった瞬間・遅れ・骨の長さ）、骨の長さを守るために「向き」だけをならす工夫を、チート900のデータで確かめる。",
+      "url": "https://physics-engine.habatakijuku.com/stage8",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 8,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE8 ならすと何が変わる",
+          "item": "https://physics-engine.habatakijuku.com/stage8"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 8 ― ならすと何が変わる ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 8</span><h1 class="chapter-title">ならすと何が変わる</h1>
+        <div class="chapter-sub">時間方向のフィルタ</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">前後のコマとの<strong>重みつき平均</strong>で動きのぶれをならす計算を身につけよう。ならしすぎると蹴りのいちばん高い所が下がること、過去のコマだけを使うと動きが遅れること、点ごとにならすと骨の長さが変わってしまうことを説明でき、<strong>向きだけをならす</strong>直し方がわかれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">チート900の動きは、もとは動画から1コマずつ体の点の位置を読み取って作った。ところが、読み取った位置は毎コマ少しずつぶれる。服のしわや影、手足の重なりで、読み取りが数 cm ずれるんだ。そのまま並べると、つま先の通り道がガタガタに波打ってしまう。前に「上から見ると蹴りの軌道が波打つのはなぜ？」と聞かれたのも、このぶれが原因の一つだった。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">1コマずつ少しずつずれているなら、前後のコマと平均すれば、ずれが打ち消し合いそうです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。いちばん簡単なのは、そのコマと前後2コマずつ、合わせて5コマの値を足して5で割る方法だ。これを<strong>移動平均</strong>という。ずれが右へ出たり左へ出たりでたらめなら、平均するとずれが打ち消し合って小さくなる。ただ、5コマを同じ重さで扱うより、近いコマを重く、遠いコマを軽く扱うほうが自然だ。そこで、重さを釣り鐘の形に並べる。コマの差を d として、重さを<br><strong>w(d) ＝ e<sup>−d² ÷ (2σ²)</sup></strong><br>とし、重さの合計で割る。σ（シグマ）は釣り鐘の幅で、σ コマ離れると重さは約 0.61 倍、2σ 離れると約 0.14 倍になる。この重さの並びを<strong>ガウスフィルタ</strong>という。ステージ6の重心と同じ、<strong>重みつき平均</strong>だね。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">重さを使った平均なら、ステージ6で何度もやりました。σ を大きくすると、遠くのコマまで平均に入るので、よりなめらかになるんですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">下の図で、頭を上から見た通り道に、読み取りのぶれをわざと足してみた。σ を変えて、ならし方を確かめよう。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="上から見た頭の通り道。ぶれを足した道すじ（灰色）を、ガウスフィルタでならした道すじ（青）。σを大きくするとなめらかになるが、大きくしすぎると曲がり角が丸まる"></canvas></div>
+        <div class="sim-controls">
+          <label>ぶれの大きさ <input type="range" id="nz1" min="0" max="0.06" value="0.02" step="0.002"> <output id="nz1o"></output></label>
+          <label>ならす幅 σ <input type="range" id="sg1" min="0" max="8" value="2" step="0.25"> <output id="sg1o"></output></label>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">構えから着地まで、頭（両耳の真ん中）の通り道を上から見た図（下が進行方向、右が的の方向）。黒い点線がもとの動き、灰色が読み取りのぶれを足したもの、青がならしたもの。右下の釣り鐘がガウスフィルタの重さ</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">σ が 3 コマくらいで、ガタガタがほとんど消えました。でも σ を 8 まで大きくすると、青い線がもとの点線から離れて、差が 5 cm 以上になってしまいます。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そこが大事な点だ。ならすというのは、近くのコマと混ぜることだから、<strong>とがった所は丸くなる</strong>。いちばん高く上がった瞬間も、前後のまだ低いコマと混ざって、引き下げられる。蹴り技でいちばん見せたいインパクトが、ならしすぎると弱く見えてしまうんだ。もう一つ、ゲームのように、いまのコマを見せる時点で<strong>過去のコマしか使えない</strong>場合はどうなるだろう。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="蹴り脚のつま先の高さの時間変化。前後のコマを使うならし方と、過去のコマだけを使うならし方を比べる。過去だけを使うと、いちばん高い所が遅れて低くなる"></canvas></div>
+        <div class="sim-controls">
+          <label>ならす幅 σ <input type="range" id="sg2" min="0.5" max="8" value="3" step="0.25"> <output id="sg2o"></output></label>
+        </div>
+        <div class="sim-controls" id="md2">
+          <button class="btn" type="button" data-m="both" aria-pressed="true">前後のコマを使う</button>
+          <button class="btn" type="button" data-m="past" aria-pressed="false">過去のコマだけ使う</button>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">横軸は時間、縦軸はつま先の高さ。黒い点線がもとの動き、青がならしたもの。縦の線はインパクト（1.32 秒）。下の釣り鐘は、いまのコマ（縦線）の値を作るのに使う重さ</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">過去のコマだけ使うと、青い線全体が右へずれました。いちばん高い所が遅れて、しかも低くなっています。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">過去のコマの平均は、いつも少し前の値に引っぱられるからだ。アニメーションを作るときは、全部のコマがもう手元にあるので、前後のコマを使って遅れをなくせる。ゲームやロボットのように、その場で計算しなければならない場合は、この遅れとどうつき合うかが大きな問題になる。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">体の点をそれぞれ、いまのやり方でならせばいいんですよね？ 膝も足首も、同じようにならせば……。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そこに落とし穴がある。膝と足首を別々にならすと、ある瞬間の膝は少し前のコマ寄り、足首は少し後ろのコマ寄りに引っぱられることがある。そうすると、膝から足首までの長さ、つまり<strong>すねの長さが毎コマ変わってしまう</strong>。ゴムのように伸び縮みする脚になるんだ。そこで、位置ではなく<strong>骨の向き</strong>（長さ1のベクトル）をならし、ならした向きの先に、決まった長さの骨をつなぎ直す。股関節から順に「向き × 長さ」を足していけば、骨の長さは毎コマぴったり同じになる。下の図で、3つのならし方を比べてみよう。3つ目はこのあと説明する。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="蹴り脚のすねの長さと膝の角度の時間変化。点ごとに位置をならすと長さが変わり、骨ごとに向きをならすと長さは保たれるが膝の角度が変わる。脚全体の向きだけをならしてIKで膝を決めると、長さも膝の角度も保たれる"></canvas></div>
+        <div class="sim-controls">
+          <label>ならす幅 σ <input type="range" id="sg3" min="0" max="8" value="4" step="0.25"> <output id="sg3o"></output></label>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">上が蹴り脚のすねの長さ（cm）、下が膝の角度（180° でまっすぐ）。黒い点線がもとの動き。赤＝膝と足首の位置をそれぞれならす、オレンジ＝太もも・すねの向きを骨ごとにならす、緑＝股関節から足首への向きだけならし、膝の角度はそのままにしてIKで膝を置き直す。縦の線はインパクト</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">位置をならした赤い線は、蹴りの瞬間のあたりで何 cm も短くなっています。オレンジは長さが一定ですが、下のグラフを見ると、インパクトで伸びきっていた膝が曲がってしまっています。緑は、長さも膝の角度も、もとのままです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">蹴りの瞬間は脚が速く大きく振られるので、前後のコマとの差が大きく、位置を混ぜると「近道」をして脚が縮むんだ。円の上の2点の真ん中が、円の内側に入ってしまうのと同じだよ。骨ごとに向きをならすと、長さは守れるが、太ももとすねの向きがそれぞれ別のコマと混ざって、膝の曲がり具合が変わる。そこで実際には、緑のやり方をとった。股関節から足首へ向かうベクトルを「向き × 距離」に分け、<strong>向きだけ</strong>をならす。距離はそのままだから、ステージ5の余弦定理で膝の角度も変わらない。膝の位置は2関節IKで置き直せばいい。<br>体全体の向き（腰の向き）は、ステージ4の四元数でならした。そのときの注意点は、四元数 q と −q が<strong>同じ向き</strong>を表すことだ。向きのほかに、体全体の向き（腰の向き）は、ステージ4の四元数でならした。そのときの注意点は、四元数 q と −q が<strong>同じ向き</strong>を表すことだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">符号が逆の四元数をそのまま平均すると、足して打ち消し合って、0 に近くなってしまいます。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。だから平均する前に、となりのコマの四元数との内積を調べて、マイナスなら符号を反対にしてそろえる。そのうえで重みつき平均をとり、長さを1に戻す。向きの小さな違いなら、これでなめらかな向きが得られる。上から見た蹴りの軌道の波も、最後は腰の向きのぶれをこうしてならし、脚は股関節から足首への向きだけをならすことで、骨の長さも膝の曲げ方も変えずに消すことができた。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">ガウスフィルタ：<span class="nw">ならした値 ＝ Σ w(d)・x(k＋d) ÷ Σ w(d)</span>、<span class="nw">w(d) ＝ e<sup>−d²÷(2σ²)</sup></span>。σ が大きいほどなめらか</span>
+        <span class="step">ならすと、とがった所（インパクトの届く距離・高さ）は丸く小さくなる。過去のコマだけ使うと遅れる</span>
+        <span class="step">点ごとに位置をならすと骨の長さが変わる → 股関節から足首への<strong>向きだけ</strong>をならし、距離（＝膝の角度）はそのまま、IKで膝を置き直す</span>
+        <span class="step">四元数は q と −q が同じ向き。<strong>符号をそろえてから</strong>平均し、長さを1に戻す</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 5コマの値が 0, 0, 10, 0, 0 と並んでいる。真ん中のコマを、5コマの移動平均（同じ重さ）でならすといくつ？</p>
+        <div class="choice-list">
+          <button class="choice-btn">2</button>
+          <button class="choice-btn">10</button>
+          <button class="choice-btn">0</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ (0＋0＋10＋0＋0) ÷ 5 ＝ 2。1コマだけとがった値は、ならすと大きく下がる。インパクトのような一瞬のピークも同じように小さくなる。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 膝と足首の位置を、それぞれ別々にならした。変わってしまうおそれがあるのは？</p>
+        <div class="choice-list">
+          <button class="choice-btn">重力の大きさ</button>
+          <button class="choice-btn">何も変わらない</button>
+          <button class="choice-btn">すねの長さ</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 2つの点を別々に平均すると、2点の間の距離は保たれない。骨の向きをならして、決まった長さでつなぎ直せば長さは変わらない。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 腰の向きを表す四元数を、前後のコマと平均するときに必要なことは？</p>
+        <div class="choice-list">
+          <button class="choice-btn">そのまま4つの数を平均すればよい</button>
+          <button class="choice-btn">となりのコマとの内積がマイナスなら符号を反対にしてから平均し、長さを1に戻す</button>
+          <button class="choice-btn">四元数は平均できないので、ならせない</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ q と −q は同じ向きを表すので、符号がばらばらのまま足すと打ち消し合う。符号をそろえてから平均し、長さを1に戻す。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(8);</script>
+<script>
+/* 決まった並びの乱数（毎回同じぶれになるように） */
+function rng(seed){var s=seed>>>0; return function(){s=(s*1664525+1013904223)>>>0; return s/4294967296;};}
+function gauss(r){return Math.sqrt(-2*Math.log(r()+1e-12))*Math.cos(PE.TAU*r());}
+/* ガウスフィルタ：arr は数の並び、past＝true なら過去のコマだけ使う */
+function gfilt(arr,sg,past){
+  if(sg<=0) return arr.slice();
+  var R=Math.ceil(3*sg);
+  return arr.map(function(_,i){var s=0,w=0; for(var d=-R;d<=(past?0:R);d++){var j=i+d; if(j<0||j>=arr.length) continue; var ww=Math.exp(-d*d/(2*sg*sg)); s+=ww*arr[j]; w+=ww;} return s/w;});
+}
+function gfilt3(P,sg){var o=[0,1,2].map(function(c){return gfilt(P.map(function(p){return p[c];}),sg);}); return P.map(function(_,i){return [o[0][i],o[1][i],o[2][i]];});}
+function bell(ctx,x0,x1,y,h,sg,past,col){
+  var R=Math.max(1,Math.ceil(3*Math.max(sg,0.3))), cx=(x0+x1)/2, dx=(x1-x0)/2/Math.max(R,4);
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.6;
+  for(var d=-R;d<=(past?0:R);d++){var w=sg>0?Math.exp(-d*d/(2*sg*sg)):(d===0?1:0); ctx.fillRect(cx+d*dx-1.5,y-w*h,3,w*h);}
+  PE.text(ctx,cx,y+10,'重さ w(d)',col,10,800);
+}
+var KICK=[Math.round(PE.M.events.takeoff*PE.fps), Math.round(PE.M.events.landR*PE.fps)+6], IMP=Math.round(PE.M.events.impact*PE.fps);
+
+/* ---------- シミュレータ1：上から見た頭の通り道 ---------- */
+(function(){
+  var nz=0.02, sg=2, st, a=0, b=PE.N-1;
+  var orig=[]; for(var k=a;k<=b;k++) orig.push(PE.mid(PE.P(k,'earR'),PE.P(k,'earL')));
+  var r=rng(7), E=orig.map(function(){return [gauss(r),gauss(r),gauss(r)];});
+  function rough(arr){var s=0; for(var i=1;i<arr.length-1;i++) s+=PE.len(PE.add(PE.sub(arr[i-1],PE.mul(arr[i],2)),arr[i+1])); return s/(arr.length-2);}
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var noisy=orig.map(function(p,i){return PE.add(p,PE.mul(E[i],nz));}), sm=gfilt3(noisy,sg);
+    var xs=orig.map(function(p){return p[0];}), zs=orig.map(function(p){return p[2];});
+    var x0=Math.min.apply(null,xs)-0.15, x1=Math.max.apply(null,xs)+0.15, z0=Math.min.apply(null,zs)-0.2, z1=Math.max.apply(null,zs)+0.2;
+    var s=Math.min((W-40)/(z1-z0),(H-30)/(x1-x0)), ox=W/2-(z0+z1)/2*s, oy=H/2-(x0+x1)/2*s;
+    var P=function(p){return {x:ox+p[2]*s, y:oy+p[0]*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var g=Math.ceil(z0*4)/4;g<=z1;g+=0.25){var A=P([x0,0,g]),B=P([x1,0,g]);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();} for(g=Math.ceil(x0*4)/4;g<=x1;g+=0.25){A=P([g,0,z0]);B=P([g,0,z1]);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();}
+    function path(arr,col,w,dash){ctx.strokeStyle=col; ctx.lineWidth=w; ctx.setLineDash(dash||[]); ctx.beginPath(); arr.forEach(function(p,i){var q=P(p); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);}); ctx.stroke(); ctx.setLineDash([]);}
+    path(noisy,'#b9b0a3',1.6); path(orig,PE.C.ink,1.6,[4,4]); path(sm,PE.C.acc,2.8);
+    var q0=P(orig[0]), q1=P(orig[orig.length-1]); PE.text(ctx,q0.x+8,q0.y-6,'構え',PE.C.ink,11,900,'left'); PE.text(ctx,q1.x+8,q1.y+8,'着地のあと',PE.C.ink,11,900,'left');
+    bell(ctx,W-120,W-20,H-22,26,sg,false,PE.C.acc);
+    var e2=0; sm.forEach(function(p,i){e2+=PE.len(PE.sub(p,orig[i]));});
+    document.getElementById('ro1').innerHTML='<span>ガタガタの大きさ（1コマごとの曲がり）：もと <b>'+PE.fmt(rough(orig)*1000,1)+'</b> mm、ぶれあり <b>'+PE.fmt(rough(noisy)*1000,1)+'</b> mm → ならした後 <b>'+PE.fmt(rough(sm)*1000,1)+'</b> mm</span><span>もとの動きとの差（平均） <b>'+PE.fmt(e2/orig.length*100,1)+'</b> cm</span>';
+  }
+  st=PE.canvas('cv1',0.8,draw);
+  PE.bindRange('nz1','nz1o',function(v){return PE.fmt(v*100,1)+' cm';},function(v){nz=v;st.redraw();});
+  PE.bindRange('sg1','sg1o',function(v){return PE.fmt(v,2)+' コマ';},function(v){sg=v;st.redraw();});
+})();
+
+/* ---------- シミュレータ2：ピークが下がる・遅れる ---------- */
+(function(){
+  var sg=3, past=false, st, a=Math.round(0.9*PE.fps), b=Math.round(1.8*PE.fps);
+  var Y=[]; for(var k=0;k<PE.N;k++) Y.push(PE.P(k,'toeR')[1]);
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var sm=gfilt(Y,sg,past), L=44,R=W-12,T=20,B=H-60, lo=0, hi=2.0;
+    var X=function(k){return L+(R-L)*(k-a)/(b-a);}, Yp=function(v){return B-(B-T)*(v-lo)/(hi-lo);};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var v=0;v<=2.0001;v+=0.5){ctx.beginPath();ctx.moveTo(L,Yp(v));ctx.lineTo(R,Yp(v));ctx.stroke();PE.text(ctx,L-5,Yp(v),PE.fmt(v,1)+'m',PE.C.muted,10,700,'right');}
+    for(var t=1.0;t<=1.8001;t+=0.2){ctx.beginPath();ctx.moveTo(X(t*PE.fps),T);ctx.lineTo(X(t*PE.fps),B);ctx.stroke();PE.text(ctx,X(t*PE.fps),B+12,PE.fmt(t,1)+'秒',PE.C.muted,10,700);}
+    function line(arr,col,w,dash){ctx.strokeStyle=col; ctx.lineWidth=w; ctx.setLineDash(dash||[]); ctx.beginPath(); for(var k=a;k<=b;k++){var q={x:X(k),y:Yp(arr[k])}; if(k>a)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);} ctx.stroke(); ctx.setLineDash([]);}
+    line(Y,PE.C.ink,1.6,[4,4]); line(sm,PE.C.acc,2.8);
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(X(IMP),T); ctx.lineTo(X(IMP),B); ctx.stroke();
+    var pk=function(arr){var m=a; for(var k=a;k<=b;k++) if(arr[k]>arr[m]) m=k; return m;}, p0=pk(Y), p1=pk(sm);
+    [[p0,Y,PE.C.ink],[p1,sm,PE.C.acc]].forEach(function(e){ctx.fillStyle=e[2]; ctx.beginPath(); ctx.arc(X(e[0]),Yp(e[1][e[0]]),4.5,0,PE.TAU); ctx.fill();});
+    /* 釣り鐘：インパクトのコマの値を作る重さ */
+    var R3=Math.ceil(3*sg), dx=(X(1)-X(0)), y0=H-16;
+    ctx.fillStyle=PE.C.acc; for(var d=-R3;d<=(past?0:R3);d++){var w=Math.exp(-d*d/(2*sg*sg)); ctx.fillRect(X(IMP+d)-1.5,y0-w*22,3,w*22);}
+    PE.text(ctx,L+4,T+4,'つま先の高さ',PE.C.ink,11.5,900,'left');
+    document.getElementById('ro2').innerHTML='<span>いちばん高い所：もと <b>'+PE.fmt(Y[p0],2)+'</b> m（'+PE.fmt(p0/PE.fps,3)+' 秒） → ならした後 <b>'+PE.fmt(sm[p1],2)+'</b> m（'+PE.fmt(p1/PE.fps,3)+' 秒）</span><span>遅れ <b>'+PE.fmt((p1-p0)/PE.fps*1000,0)+'</b> ミリ秒</span>';
+  }
+  st=PE.canvas('cv2',0.62,draw);
+  PE.bindRange('sg2','sg2o',function(v){return PE.fmt(v,2)+' コマ';},function(v){sg=v;st.redraw();});
+  document.querySelectorAll('#md2 .btn').forEach(function(btn){btn.addEventListener('click',function(){past=btn.getAttribute('data-m')==='past'; document.querySelectorAll('#md2 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===btn?'true':'false');}); st.redraw();});});
+})();
+
+/* ---------- シミュレータ3：すねの長さと膝の角度 ---------- */
+(function(){
+  var sg=4, st, a=Math.round(0.6*PE.fps), b=Math.round(1.9*PE.fps), H_=[],K=[],A=[];
+  for(var k=0;k<PE.N;k++){H_.push(PE.P(k,'hipR')); K.push(PE.P(k,'kneeR')); A.push(PE.P(k,'ankleR'));}
+  var L1=PE.len(PE.sub(K[0],H_[0])), L2=PE.len(PE.sub(A[0],K[0]));
+  var ang=function(h,kq,aq){return PE.deg(Math.acos(Math.max(-1,Math.min(1,PE.dot(PE.norm(PE.sub(h,kq)),PE.norm(PE.sub(aq,kq)))))));};
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    /* (1) 位置をならす */
+    var Kp=gfilt3(K,sg), Ap=gfilt3(A,sg);
+    /* (2) 骨ごとに向きをならす */
+    var u1=gfilt3(K.map(function(q,i){return PE.norm(PE.sub(q,H_[i]));}),sg).map(PE.norm);
+    var u2=gfilt3(A.map(function(q,i){return PE.norm(PE.sub(q,K[i]));}),sg).map(PE.norm);
+    var Kb=H_.map(function(h,i){return PE.add(h,PE.mul(u1[i],L1));}), Ab=Kb.map(function(q,i){return PE.add(q,PE.mul(u2[i],L2));});
+    /* (3) 股関節→足首の向きだけならし、距離はそのまま（膝はIKで置き直す） */
+    var Kc=[],Ac=[], uL=gfilt3(A.map(function(q,i){return PE.norm(PE.sub(q,H_[i]));}),sg).map(PE.norm);
+    for(var i=0;i<PE.N;i++){
+      var u0=PE.norm(PE.sub(A[i],H_[i])), d=PE.len(PE.sub(A[i],H_[i])), u=uL[i], hk=PE.sub(K[i],H_[i]);
+      var n=PE.sub(hk,PE.mul(u0,PE.dot(hk,u0)));            /* 膝が出ている向き（脚の線に直角な成分） */
+      n=PE.norm(PE.sub(n,PE.mul(u,PE.dot(n,u))));           /* ならした向きに直角になるよう直す */
+      var x=(L1*L1-L2*L2+d*d)/(2*d), h=Math.sqrt(Math.max(0,L1*L1-x*x));
+      Kc.push(PE.add(H_[i],PE.add(PE.mul(u,x),PE.mul(n,h)))); Ac.push(PE.add(H_[i],PE.mul(u,d)));
+    }
+    var M=[[Kp,Ap,PE.C.ng,2.4],[Kb,Ab,'#d9822b',2.4],[Kc,Ac,PE.C.ok,2.8],[K,A,PE.C.ink,1.2,[4,4]]];
+    var Lf=44,R=W-12,T1=20,B1=H*0.47,T2=H*0.47+26,B2=H-28;
+    var X=function(k){return Lf+(R-Lf)*(k-a)/(b-a);};
+    var lo1=(L2-0.08)*100, hi1=(L2+0.03)*100, Y1=function(v){return B1-(B1-T1)*(v*100-lo1)/(hi1-lo1);}, Y2=function(v){return B2-(B2-T2)*(v-60)/(185-60);};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1;
+    for(var v=Math.ceil(lo1/2)*2;v<=hi1;v+=2){var y=Y1(v/100);ctx.beginPath();ctx.moveTo(Lf,y);ctx.lineTo(R,y);ctx.stroke();PE.text(ctx,Lf-5,y,v,PE.C.muted,10,700,'right');}
+    [60,90,120,150,180].forEach(function(v){var y=Y2(v);ctx.beginPath();ctx.moveTo(Lf,y);ctx.lineTo(R,y);ctx.stroke();PE.text(ctx,Lf-5,y,v+'°',PE.C.muted,10,700,'right');});
+    for(var t=0.6;t<=1.9001;t+=0.2){PE.text(ctx,X(t*PE.fps),B2+12,PE.fmt(t,1)+'秒',PE.C.muted,10,700);}
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(X(IMP),T1); ctx.lineTo(X(IMP),B2); ctx.stroke();
+    function line(f,Y,T,B,col,w,dash){ctx.save(); ctx.beginPath(); ctx.rect(Lf,T-2,R-Lf,B-T+4); ctx.clip(); ctx.strokeStyle=col; ctx.lineWidth=w; ctx.setLineDash(dash||[]); ctx.beginPath(); for(var k=a;k<=b;k++){var y=Y(f(k)); if(k>a)ctx.lineTo(X(k),y); else ctx.moveTo(X(k),y);} ctx.stroke(); ctx.restore();}
+    M.forEach(function(m){line(function(k){return PE.len(PE.sub(m[1][k],m[0][k]));},Y1,T1,B1,m[2],m[3],m[4]); line(function(k){return ang(H_[k],m[0][k],m[1][k]);},Y2,T2,B2,m[2],m[3],m[4]);});
+    PE.text(ctx,Lf+4,T1+4,'すねの長さ（cm）',PE.C.ink,11.5,900,'left'); PE.text(ctx,Lf+4,T2-10,'膝の角度',PE.C.ink,11.5,900,'left');
+    var mn=Infinity; for(var k=a;k<=b;k++) mn=Math.min(mn,PE.len(PE.sub(Ap[k],Kp[k])));
+    document.getElementById('ro3').innerHTML='<span>すねの長さ：もと <b>'+PE.fmt(L2*100,1)+'</b> cm、位置をならすと最短 <b>'+PE.fmt(mn*100,1)+'</b> cm</span><span>インパクトの膝の角度：もと <b>'+PE.fmt(ang(H_[IMP],K[IMP],A[IMP]),0)+'</b>°、<span style="color:'+PE.C.ng+'">位置</span> <b>'+PE.fmt(ang(H_[IMP],Kp[IMP],Ap[IMP]),0)+'</b>°、<span style="color:#d9822b">骨ごとの向き</span> <b>'+PE.fmt(ang(H_[IMP],Kb[IMP],Ab[IMP]),0)+'</b>°、<span style="color:'+PE.C.ok+'">脚全体の向き</span> <b>'+PE.fmt(ang(H_[IMP],Kc[IMP],Ac[IMP]),0)+'</b>°</span>';
+  }
+  st=PE.canvas('cv3',0.85,draw);
+  PE.bindRange('sg3','sg3o',function(v){return PE.fmt(v,2)+' コマ';},function(v){sg=v;st.redraw();});
+})();
+</script>
+</body>
+</html>

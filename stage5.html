@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE5 膝の置き場所（2関節IK と三平方の定理） ― チート900を数式で動かす</title>
+<meta name="description" content="股関節と足首の位置が決まれば、膝はある円の上のどこか。三平方の定理2回で円を求め、膝が向く向き（ポール）で1点に決める2関節IK。脚が伸び切ると膝の向きが決まらなくなり、蹴りの瞬間につま先がジグザグした原因と、その直し方まで。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE5 膝の置き場所（2関節IK と三平方の定理） ― チート900を数式で動かす">
+<meta property="og:description" content="足首の位置から膝の位置を決める2関節IK。三平方の定理で膝の円を求め、膝の向きで1点に決める。蹴りの瞬間につま先がジグザグした原因と直し方まで。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage5">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE5 膝の置き場所",
+      "description": "股関節と足首の位置が決まれば、膝はある円の上のどこか。三平方の定理2回で円を求め、膝が向く向き（ポール）で1点に決める2関節IK。脚が伸び切ると膝の向きが決まらなくなり、蹴りの瞬間につま先がジグザグした原因と、その直し方まで。",
+      "url": "https://physics-engine.habatakijuku.com/stage5",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 5,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE5 膝の置き場所",
+          "item": "https://physics-engine.habatakijuku.com/stage5"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 5 ― 膝の置き場所 ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 5</span><h1 class="chapter-title">膝の置き場所</h1>
+        <div class="chapter-sub">2関節IK と三平方の定理</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">股関節と足首の位置から膝の位置を決める<strong>2関節IK</strong>を、三平方の定理だけで組み立てよう。膝が乗る円の中心と半径を式で出し、「膝が向く向き（ポール）」で1点に決める方法と、脚が伸び切るとその向きが不安定になる理由を説明できれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">アニメーションを作るとき、「<strong>足をここに置きたい</strong>」と先に決めることがよくある。床に着いている足は、前のコマと同じ場所から動かしてはいけない（動くと床の上を滑って見える）。蹴りの瞬間には、つま先をミットの位置に届かせたい。足の位置を決めたら、それに合わせて<strong>膝の位置を計算で決め直す</strong>。このように、手先や足先の位置から関節の位置を逆に求める計算を、<strong>逆運動学（インバース・キネマティクス、IK）</strong>という。股関節・膝・足首の2つの関節でつながった脚なら<strong>2関節IK</strong>だ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">太ももとすねの長さは変わらないので、膝は「股関節から太ももの長さ」の所で、しかも「足首からすねの長さ」の所にある、ということですよね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだ。股関節を H、足首を A、太ももの長さを L₁、すねの長さを L₂ としよう。H から L₁ の点の集まりは、H を中心とする球。A から L₂ の点の集まりは、A を中心とする球。膝は、この2つの球が交わる所にある。2つの球が交わると、どんな形になると思う？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">シャボン玉が2つくっついたときの境目みたいに、円になると思います。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。H と A を結ぶ線を軸にした<strong>円</strong>になる。この円の中心と半径を求めよう。H と A の距離を d とする。膝 K から H と A を結ぶ線へ垂直に線を下ろし、その足を M とする。H から M までの長さを x、M から膝までの高さを h とすると、直角三角形が2つできる。三平方の定理で式を2つ書いてごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <svg viewBox="0 0 400 230" width="100%" style="max-width:440px" role="img" aria-label="2関節IKの図。股関節Hと足首Aを結ぶ線（長さd）に、膝Kから垂直に下ろした足M。HからMまでがx、Mから膝までがh。左の直角三角形で x²＋h²＝L1²、右の直角三角形で (d−x)²＋h²＝L2²">
+          <line x1="50" y1="170" x2="350" y2="170" stroke="#b9b0a3" stroke-width="1.4" stroke-dasharray="5 4"/>
+          <line x1="50" y1="170" x2="170" y2="50" stroke="#c8433f" stroke-width="5" stroke-linecap="round"/>
+          <line x1="170" y1="50" x2="350" y2="170" stroke="#e07a5f" stroke-width="5" stroke-linecap="round"/>
+          <line x1="170" y1="50" x2="170" y2="170" stroke="#6a7684" stroke-width="1.6" stroke-dasharray="4 3"/>
+          <path d="M160 170 V160 H170" fill="none" stroke="#6a7684" stroke-width="1.2"/>
+          <circle cx="50" cy="170" r="6" fill="#1b232c"/><circle cx="170" cy="50" r="6" fill="#c8433f"/><circle cx="350" cy="170" r="6" fill="#1b232c"/><circle cx="170" cy="170" r="4" fill="#6a7684"/>
+          <text x="40" y="192" font-size="14" font-weight="900" fill="#1b232c">H</text>
+          <text x="352" y="192" font-size="14" font-weight="900" fill="#1b232c">A</text>
+          <text x="168" y="36" font-size="14" font-weight="900" fill="#c8433f" text-anchor="middle">K（膝）</text>
+          <text x="174" y="190" font-size="13" font-weight="900" fill="#6a7684">M</text>
+          <text x="96" y="104" font-size="14" font-weight="900" fill="#c8433f">L₁</text>
+          <text x="268" y="102" font-size="14" font-weight="900" fill="#e07a5f">L₂</text>
+          <text x="110" y="186" font-size="13" font-weight="900" fill="#2f7a55" text-anchor="middle">x</text>
+          <text x="260" y="186" font-size="13" font-weight="900" fill="#2f7a55" text-anchor="middle">d − x</text>
+          <text x="176" y="114" font-size="13" font-weight="900" fill="#2f6fb8">h</text>
+          <text x="200" y="218" font-size="12.5" font-weight="900" fill="#1b232c" text-anchor="middle">x² ＋ h² ＝ L₁²　　(d − x)² ＋ h² ＝ L₂²</text>
+        </svg>
+        <div class="diagram-caption">股関節 H と足首 A を結ぶ線（長さ d）に、膝 K から垂直に下ろした足が M。左の直角三角形 HMK と、右の直角三角形 AMK のそれぞれで、三平方の定理が成り立つ</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">左の三角形で x² ＋ h² ＝ L₁²、右の三角形で (d−x)² ＋ h² ＝ L₂² です。2つの式を引き算すると h² が消えて、x² − (d−x)² ＝ L₁² − L₂²。左辺を展開すると x² − d² ＋ 2dx − x² ＝ 2dx − d² なので、2dx ＝ L₁² − L₂² ＋ d²。<strong>x ＝ (L₁² − L₂² ＋ d²) ÷ (2d)</strong> です。h は1つ目の式から <strong>h ＝ √(L₁² − x²)</strong>。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">見事だ。これで、膝が乗る円の<strong>中心は H から A の向きへ x 進んだ点 M</strong>、<strong>半径は h</strong> と分かった。H から A へ向かう長さ1の矢印を u とすると、M ＝ H ＋ x u。膝は M から、u に直角な向きへ h 離れた所にある。でも、u に直角な向きはぐるっと一周いくらでもある。円の上のどこに膝を置くかは、まだ決まっていない。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">本物の膝は、どこにでも曲がるわけではないですよね。膝はいつも、つま先と同じような向きに出ます。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう、その「膝を出したい向き」を矢印で与える。これを<strong>ポール</strong>（極）と呼ぶことが多い。ポールの矢印から、u の向きの成分（内積で取り出せる）を引いて u に直角にし、長さを1にそろえたものを p とすれば、膝は<br><strong>K ＝ H ＋ x u ＋ h p</strong><br>で1点に決まる。ふつうは、ポールとして<strong>そのコマの膝の向き</strong>（今の膝の位置から作る）を使う。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="平面の2関節IK。足首の位置を動かすと、膝が乗る2つの候補（上と下）のうち、ポールの向きの側に膝が置かれる。届かないときは脚がまっすぐ足首の方へ伸びる"></canvas></div>
+        <div class="sim-controls">
+          <label>足首の位置（横） <input type="range" id="ax1" min="-0.2" max="0.95" value="0.55" step="0.01"> <output id="ax1o"></output></label>
+          <label>足首の位置（縦） <input type="range" id="ay1" min="-0.95" max="0.4" value="-0.55" step="0.01"> <output id="ay1o"></output></label>
+        </div>
+        <div class="sim-controls" id="pole1">
+          <span style="font-size:11.5px;font-weight:800;color:var(--muted)">ポール：</span>
+          <button class="btn" type="button" data-p="1" aria-pressed="true">前（膝を前へ出す）</button>
+          <button class="btn" type="button" data-p="-1" aria-pressed="false">後ろ</button>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">股関節 H は固定。足首 A を動かすと、x と h が式から決まり、膝は2つの候補（白丸）のうちポールの側に置かれる。H と A の距離 d が L₁＋L₂ を越えると、膝をまっすぐ伸ばしても届かない（赤い表示）</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">足首を遠くへ動かすと「届かない」と出ました。d が太ももとすねの長さの合計より長いと、h のルートの中がマイナスになるからですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだ。そのときは脚をまっすぐ伸ばすしかないが、それでも足首には届かない。床に着いている足でこれが起きると、足が床から浮いたり、床の上を滑ったりしてしまう。このアニメーションを動画に合わせたときにも、体の位置を動かしたせいで、床に着いている足に脚が届かないコマが出た。そこでは<strong>体のほうを、足が届く所まで寄せる</strong>ことで直している。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">もう1つ気になります。膝がほとんど伸び切っているときは、h がとても小さくなります。そのときもポールの向きはちゃんと決まるんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">鋭いね。今の膝の位置からポールを作ると、それは「H と A を結ぶ線から膝へ向かう矢印」になる。脚がほぼ伸び切っていると、この矢印はとても短い。ステージ2で見た外積と同じで、<strong>短い矢印の向きは、点が数 mm ずれるだけで大きく変わる</strong>。実際にこのアニメーションでは、インパクトの瞬間に膝を 177° まで伸ばそうとしたとき、膝の曲がる向き（外積で求めた蝶番の軸）が<strong>1コマおきに裏返り</strong>、つま先が1コマごとにジグザグに動いてしまった。下の図はそれを再現したものだ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="膝を伸ばし切っていく脚の再現。毎コマ外積で膝の向きを決めると、伸び切った所でつま先がジグザグに動く。曲がっているコマの向きを引き継ぐと、なめらかに伸びる"></canvas></div>
+        <div class="sim-controls" id="mode2">
+          <button class="btn" type="button" data-m="cross" aria-pressed="true">毎コマ、外積で膝の向きを決める</button>
+          <button class="btn" type="button" data-m="carry" aria-pressed="false">曲がっているコマの向きを引き継ぐ</button>
+        </div>
+        <div class="sim-controls">
+          <label>点のずれ（数 mm） <input type="range" id="nz2" min="0" max="6" value="3" step="0.5"> <output id="nz2o"></output></label>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">膝を 120° から 179° まで、12 コマかけて伸ばしていく脚（上から見た図。足先の点の軌跡をオレンジで結んでいる）。点の位置にわずかなずれがあると、毎コマ外積で膝の向きを決める方法では、脚が伸び切った所で膝の向きが裏返り、つま先が左右に跳ぶ</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">毎コマ外積で向きを決めると、最後の数コマでつま先が左右に跳んでいます。「引き継ぐ」にすると、まっすぐきれいに伸びていきます。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">直し方は2つ使った。1つは、<strong>膝がはっきり曲がっているコマで求めた向きを、伸び切ったコマへ引き継ぐ</strong>こと。伸び切ったコマの前後で向きをなめらかにつなぎ、裏返ったら向きを反対にそろえる。もう1つは、蹴り脚の形そのものを、問題のなかった前の版の形（骨盤から見た座標で取り出したもの）に戻すことだ。どちらも「<strong>不安定な所では、その場の計算に頼らず、安定な所の情報を使う</strong>」という考え方だね。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">膝の向きは、つま先の向きとも関係がありますよね。膝とつま先がばらばらの向きを向いていたら、人の脚ではありえない形になります。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通りで、それも確かめている。すねの前の向き（膝が曲がる向き）とつま先の向きのずれは、ふつう 30° 前後までだ。このアニメーションでは一時期、踏み切りの直後に膝の曲がる向きが、つま先に対してぐるっと一周してしまうコマがあった。ずれの角度を内積で毎コマ計算して、大きすぎるコマを見つけ、足の向きや膝の位置を直した。<strong>IK は位置だけでなく、向きの約束も守らないと、人の体にならない</strong>んだ。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">2関節IK：股関節 H・足首 A・太もも L₁・すね L₂ から膝 K を求める。膝は2つの球の交わり＝ H と A を結ぶ線を軸にした円の上</span>
+        <span class="step">円の中心までの距離 <span class="nw">x ＝ (L₁² − L₂² ＋ d²) ÷ (2d)</span>、半径 <span class="nw">h ＝ √(L₁² − x²)</span>（三平方の定理2回を引き算）</span>
+        <span class="step">膝 <span class="nw">K ＝ H ＋ x u ＋ h p</span>（u は H→A の向き、p はポールから u の成分を引いて長さ1にした向き）</span>
+        <span class="step">d ＞ L₁＋L₂ なら届かない（床の足なら、体のほうを寄せる）</span>
+        <span class="step">伸び切ると h もポールも小さくなり、向きが不安定に（つま先のジグザグ）。曲がっているコマの向きを引き継ぐ。膝とつま先の向きのずれも確かめる</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 太もも 0.4 m、すね 0.4 m、股関節から足首までの距離 d が 0.4 m のとき、股関節と足首を結ぶ線から膝までの距離 h は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">約 0.35 m</button>
+          <button class="choice-btn">0.4 m</button>
+          <button class="choice-btn">0.2 m</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ x ＝ (0.16 − 0.16 ＋ 0.16) ÷ 0.8 ＝ 0.2、h ＝ √(0.16 − 0.04) ＝ √0.12 ≈ 0.35 m。3辺が 0.4 m の正三角形の高さと同じ。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 股関節から足首までの距離 d が、太ももとすねの長さの合計より長いとどうなる？</p>
+        <div class="choice-list">
+          <button class="choice-btn">膝の位置が2か所に決まる</button>
+          <button class="choice-btn">脚をまっすぐ伸ばしても足首に届かない</button>
+          <button class="choice-btn">膝が股関節に重なる</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ h ＝ √(L₁² − x²) のルートの中がマイナスになり、膝の置き場所がない。床に着いている足でこうなったら、体のほうを足が届く所まで寄せる。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 脚が伸び切ったコマで、その場の膝の位置や外積から膝の向きを決めないほうがよいのはなぜ？</p>
+        <div class="choice-list">
+          <button class="choice-btn">計算が遅くなるから</button>
+          <button class="choice-btn">伸び切った脚では、膝の向きはどうでもよいから</button>
+          <button class="choice-btn">向きを表す矢印がとても短くなり、点のわずかなずれで向きが裏返るから</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 伸び切ると、線から膝への矢印も、太もも×すねの外積も、長さがほぼ 0。短い矢印の向きは数 mm のずれで裏返る。曲がっているコマの向きを引き継ぐのが安全。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(5);</script>
+<script>
+/* ---------- 2関節IK（平面） ---------- */
+(function(){
+  var L1=0.42, L2=0.42, ax=0.55, ay=-0.55, pole=1, st;
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W,H)/2.1, O={x:W*0.32,y:H*0.3}, P=function(x,y){return {x:O.x+x*s,y:O.y-y*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var i=-6;i<=10;i++){var a=P(i*0.1,0.5),b=P(i*0.1,-1.1);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();} for(i=-11;i<=5;i++){a=P(-0.6,i*0.1);b=P(1.0,i*0.1);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    var Hh=[0,0], A=[ax,ay], d=Math.hypot(A[0],A[1]), u=[A[0]/d,A[1]/d], n=[-u[1],u[0]];
+    // 届く範囲
+    ctx.strokeStyle='#e8c6c2'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.arc(O.x,O.y,(L1+L2)*s,0,PE.TAU); ctx.stroke(); ctx.setLineDash([]);
+    var reach=d<=L1+L2, x, h, K, K2;
+    if(reach){ x=(L1*L1-L2*L2+d*d)/(2*d); h=Math.sqrt(Math.max(0,L1*L1-x*x)); var sgn=(n[0]*1+n[1]*0)*pole>=0?1:-1; /* 前＝x のプラスの側へ */
+      K=[u[0]*x+n[0]*h*sgn, u[1]*x+n[1]*h*sgn]; K2=[u[0]*x-n[0]*h*sgn, u[1]*x-n[1]*h*sgn]; }
+    else { x=L1; h=0; K=[u[0]*L1,u[1]*L1]; }
+    var Hp=P(0,0), Ap=P(A[0],A[1]), Kp=P(K[0],K[1]), M=P(u[0]*x,u[1]*x);
+    ctx.strokeStyle=PE.C.axis; ctx.setLineDash([5,4]); ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(Hp.x,Hp.y); ctx.lineTo(Ap.x,Ap.y); ctx.stroke(); ctx.setLineDash([]);
+    if(reach){ var K2p=P(K2[0],K2[1]); ctx.strokeStyle='#c9c1b4'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(K2p.x,K2p.y,6,0,PE.TAU); ctx.stroke(); ctx.beginPath(); ctx.arc(Kp.x,Kp.y,9,0,PE.TAU); ctx.stroke();
+      ctx.strokeStyle=PE.C.muted; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(M.x,M.y); ctx.lineTo(Kp.x,Kp.y); ctx.stroke(); ctx.setLineDash([]); }
+    var Kend=reach?Ap:P(u[0]*(L1+L2),u[1]*(L1+L2));
+    ctx.lineCap='round'; ctx.strokeStyle=PE.C.legR; ctx.lineWidth=7; ctx.beginPath(); ctx.moveTo(Hp.x,Hp.y); ctx.lineTo(Kp.x,Kp.y); ctx.stroke();
+    ctx.strokeStyle='#e07a5f'; ctx.beginPath(); ctx.moveTo(Kp.x,Kp.y); ctx.lineTo(Kend.x,Kend.y); ctx.stroke(); ctx.lineCap='butt';
+    [[Hp,'H（股関節）',PE.C.ink],[Ap,'A（足首）',reach?PE.C.ink:PE.C.ng],[Kp,'K（膝）',PE.C.legR]].forEach(function(e){ctx.fillStyle=e[2];ctx.beginPath();ctx.arc(e[0].x,e[0].y,5,0,PE.TAU);ctx.fill();PE.text(ctx,e[0].x+10,e[0].y-12,e[1],e[2],12,900,'left');});
+    if(reach){ctx.fillStyle=PE.C.muted;ctx.beginPath();ctx.arc(M.x,M.y,3.5,0,PE.TAU);ctx.fill();PE.text(ctx,M.x+8,M.y+12,'M',PE.C.muted,11.5,900,'left');}
+    if(!reach) PE.text(ctx,W/2,H-16,'届かない：d ＝ '+PE.fmt(d,2)+' m ＞ L₁＋L₂ ＝ '+PE.fmt(L1+L2,2)+' m',PE.C.ng,13,900);
+    PE.text(ctx,10,16,'横から見た脚（左が後ろ、右が前）。点線の円が届く範囲',PE.C.muted,11.5,800,'left');
+    document.getElementById('ro1').innerHTML='<span>d = <b>'+PE.fmt(d,3)+'</b> m</span>'+(reach?'<span>x = (L₁²−L₂²＋d²)÷(2d) = <b>'+PE.fmt(x,3)+'</b> m</span><span>h = √(L₁²−x²) = <b>'+PE.fmt(h,3)+'</b> m</span><span>膝の角度 = <b>'+PE.fmt(PE.deg(Math.acos(Math.max(-1,Math.min(1,(L1*L1+L2*L2-d*d)/(2*L1*L2))))),0)+'°</b></span>':'<span>脚をまっすぐ伸ばしても届かない</span>');
+  }
+  st=PE.canvas('cv1',0.72,draw);
+  PE.bindRange('ax1','ax1o',function(v){return PE.fmt(v,2)+' m';},function(v){ax=v;st.redraw();});
+  PE.bindRange('ay1','ay1o',function(v){return PE.fmt(v,2)+' m';},function(v){ay=v;st.redraw();});
+  document.querySelectorAll('#pole1 .btn').forEach(function(b){b.addEventListener('click',function(){pole=parseInt(b.getAttribute('data-p'),10);document.querySelectorAll('#pole1 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});st.redraw();});});
+})();
+
+/* ---------- 伸び切る脚の再現：外積で毎コマ決める vs 引き継ぐ ---------- */
+(function(){
+  var mode='cross', nz=3, st;
+  // 乱数（いつも同じ並び）
+  function rnd(i){var x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)-0.5;}
+  function sim(){
+    var L1=0.42,L2=0.42, N=13, out=[], carried=null;
+    for(var f=0;f<N;f++){
+      var kneeAng=PE.rad(120+(179-120)*f/(N-1));
+      // 本当の脚：股関節は原点、脚は前（+x）へ、膝は上（+y）へ曲がる（上から見ると y は奥行き）
+      var d=Math.sqrt(L1*L1+L2*L2-2*L1*L2*Math.cos(kneeAng));
+      var A=[d,0,0], x=(L1*L1-L2*L2+d*d)/(2*d), h=Math.sqrt(Math.max(0,L1*L1-x*x));
+      var Kt=[x,0,h];
+      // 測った点（数 mm のずれ）
+      var e=nz/1000, Km=[Kt[0]+rnd(f*3)*e, Kt[1]+rnd(f*3+1)*e*2, Kt[2]+rnd(f*3+2)*e];
+      var t=PE.sub([0,0,0],Km), s=PE.sub(A,Km), ax=PE.cross(t,s), axn=PE.len(ax)>1e-9?PE.norm(ax):[0,1,0];
+      if(mode==='carry'){ if(PE.deg(Math.PI-Math.acos(PE.dot(PE.norm(t),PE.norm(s))*-1))<165 || !carried){ carried=axn; } else { if(PE.dot(axn,carried)<0) axn=PE.mul(axn,-1); axn=carried; } }
+      // 足の向き：膝の曲がる面の中で、すねに直角な向き（つま先）。軸で決める
+      var shin=PE.norm(s), toeDir=PE.norm(PE.cross(axn,shin)), toe=PE.add(A,PE.mul(toeDir,0.15));
+      out.push({A:A,toe:toe,ax:axn});
+    }
+    return out;
+  }
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var r=sim(), s=Math.min(W,H)*1.1, O={x:W*0.12,y:H*0.5}, P=function(v){return {x:O.x+v[0]*s,y:O.y-v[1]*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var i=0;i<=9;i++){var a=P([i*0.1,-0.25,0]),b=P([i*0.1,0.25,0]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    ctx.strokeStyle='#e0a94a'; ctx.lineWidth=2.5; ctx.beginPath(); r.forEach(function(f,i){var q=P(f.toe); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);}); ctx.stroke();
+    r.forEach(function(f,i){var a=P(f.A),q=P(f.toe); ctx.globalAlpha=0.25+0.75*i/(r.length-1); ctx.strokeStyle=PE.C.legR; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.fillStyle='#a06d00'; ctx.beginPath(); ctx.arc(q.x,q.y,3.5,0,PE.TAU); ctx.fill();});
+    ctx.globalAlpha=1;
+    var Hp=P([0,0,0]); ctx.fillStyle=PE.C.ink; ctx.beginPath(); ctx.arc(Hp.x,Hp.y,5,0,PE.TAU); ctx.fill(); PE.text(ctx,Hp.x+8,Hp.y-12,'股関節',PE.C.ink,11.5,900,'left');
+    PE.text(ctx,10,16,'上から見た図：足首（赤い線の根元）とつま先（茶色の点）。右へ行くほど脚が伸びる',PE.C.muted,11.5,800,'left');
+    var flips=0; for(i=1;i<r.length;i++) flips=Math.max(flips,PE.deg(Math.acos(Math.max(-1,Math.min(1,PE.dot(r[i].ax,r[i-1].ax))))));
+    var jump=0; for(i=1;i<r.length;i++) jump=Math.max(jump,Math.abs(r[i].toe[1]-r[i-1].toe[1]));
+    document.getElementById('ro2').innerHTML='<span>1コマでの膝の軸の向きの変化（最大） = <b>'+PE.fmt(flips,0)+'°</b></span><span>つま先の横への跳び（最大） = <b>'+PE.fmt(jump*100,1)+'</b> cm</span>';
+  }
+  st=PE.canvas('cv2',0.55,draw);
+  PE.bindRange('nz2','nz2o',function(v){return PE.fmt(v,1)+' mm';},function(v){nz=v;st.redraw();});
+  document.querySelectorAll('#mode2 .btn').forEach(function(b){b.addEventListener('click',function(){mode=b.getAttribute('data-m');document.querySelectorAll('#mode2 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});st.redraw();});});
+})();
+</script>
+</body>
+</html>

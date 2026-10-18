@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE2 長さと角度を測る（内積と外積） ― チート900を数式で動かす</title>
+<meta name="description" content="2本の矢印（ベクトル）から角度を取り出す内積と、2本に直角な向きを作る外積。膝の曲がる角度と、膝がどちら向きに曲がるかを、チート900の実際のデータから計算する。脚が伸び切ると外積の向きが決まらなくなる理由まで。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage2">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE2 長さと角度を測る（内積と外積） ― チート900を数式で動かす">
+<meta property="og:description" content="膝の角度は内積、膝の曲がる向きは外積。2本の矢印から角度と向きを取り出す計算を、チート900のデータで確かめる。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage2">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE2 長さと角度を測る",
+      "description": "2本の矢印（ベクトル）から角度を取り出す内積と、2本に直角な向きを作る外積。膝の曲がる角度と、膝がどちら向きに曲がるかを、チート900の実際のデータから計算する。脚が伸び切ると外積の向きが決まらなくなる理由まで。",
+      "url": "https://physics-engine.habatakijuku.com/stage2",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 2,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE2 長さと角度を測る",
+          "item": "https://physics-engine.habatakijuku.com/stage2"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 2 ― 長さと角度を測る ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 2</span><h1 class="chapter-title">長さと角度を測る</h1>
+        <div class="chapter-sub">内積と外積</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">2本のベクトルから<strong>角度</strong>を取り出す<strong>内積</strong>と、2本に<strong>直角な向き</strong>を作る<strong>外積</strong>を身につけよう。チート900の右脚で、膝の角度と「膝が曲がる向き」を計算し、脚が伸び切ると外積の向きが決まらなくなる理由を説明できれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">前のステージでは、2つの点の差でベクトル（矢印）を作り、その長さを √(x²＋y²＋z²) で測った。今日は<strong>2本の矢印の間の角度</strong>を測る。たとえば右膝の角度だ。膝から腰（股関節）へ向かう矢印と、膝から足首へ向かう矢印、この2本の間の角が膝の角度になる。まっすぐ伸びていれば 180°、深くたたんでいれば小さい角度だ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">画面の上なら分度器で測れますけど、3次元の矢印だと、どの向きから見るかで角度が変わって見えてしまいます。座標の数だけで計算できるんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">できる。そのための道具が<strong>内積</strong>だ。ベクトル a＝(a<sub>x</sub>, a<sub>y</sub>, a<sub>z</sub>) と b＝(b<sub>x</sub>, b<sub>y</sub>, b<sub>z</sub>) の内積を、<strong>同じ成分どうしを掛けて足したもの</strong>と決める。記号は a・b と書く。<br><strong>a・b ＝ a<sub>x</sub>b<sub>x</sub> ＋ a<sub>y</sub>b<sub>y</sub> ＋ a<sub>z</sub>b<sub>z</sub></strong><br>答えは矢印ではなく、ただの1つの数だ。たとえば a＝(1, 2, 0)、b＝(3, −1, 2) なら、1×3＋2×(−1)＋0×2＝1。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">掛けて足すだけなら計算は簡単です。でも、それがどうして角度と関係するんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">ある式を確かめると分かる。2本の矢印 a と b の先を結ぶ矢印は a−b だね。その長さの2乗 |a−b|² を、成分で書いて展開してみてくれないか。|a| は a の長さという意味だ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">|a−b|² ＝ (a<sub>x</sub>−b<sub>x</sub>)² ＋ (a<sub>y</sub>−b<sub>y</sub>)² ＋ (a<sub>z</sub>−b<sub>z</sub>)²。1つ目を展開すると a<sub>x</sub>² − 2a<sub>x</sub>b<sub>x</sub> ＋ b<sub>x</sub>² です。3つとも展開して並べ替えると、(a<sub>x</sub>²＋a<sub>y</sub>²＋a<sub>z</sub>²) ＋ (b<sub>x</sub>²＋b<sub>y</sub>²＋b<sub>z</sub>²) − 2(a<sub>x</sub>b<sub>x</sub>＋a<sub>y</sub>b<sub>y</sub>＋a<sub>z</sub>b<sub>z</sub>)。最初の2つのかっこは |a|² と |b|²、最後のかっこは内積なので、<strong>|a−b|² ＝ |a|² ＋ |b|² − 2 a・b</strong> になりました。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。この式を「内積＝……」の形に直すと、a・b ＝ (|a|²＋|b|²−|a−b|²)÷2。右辺には<strong>長さしか出てこない</strong>。長さは、2本の矢印を形を変えずに丸ごと回したり動かしたりしても変わらない。だから<strong>内積も、図形を丸ごと回しても変わらない</strong>。ということは、いちばん計算しやすい向きに回してから計算してもいい。2本の矢印が作る平面を x と y の平面に重ね、a を x の向きにそろえてしまおう。a と b の間の角を θ とすると、a と b の成分はどうなる？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">a は x の向きなので (|a|, 0, 0)。b は x の向きから角度 θ だけ回った向きで、長さ |b| だから、『本当はおもしろい複素数の世界』で習った cos・sin で (|b| cos θ, |b| sin θ, 0) です。内積は |a|×|b| cos θ ＋ 0 ＋ 0 ＝ <strong>|a| |b| cos θ</strong>……角度が出てきました！</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">それが内積のいちばん大事な性質だ。<br><strong>a・b ＝ |a| |b| cos θ</strong><br>逆に使えば、<strong>cos θ ＝ a・b ÷ (|a| |b|)</strong>。成分から内積と2つの長さを計算すれば、cos θ が分かる。cos θ から角度 θ に戻す計算は、関数電卓やコンピュータの arccos（アークコサイン）という機能がやってくれる。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="2本の矢印 a と b。角度と長さを変えると、内積を成分の掛け算の和で計算した値と、|a||b|cosθ で計算した値が同じになる。b の a 方向への影も表示"></canvas></div>
+        <div class="sim-controls">
+          <label>a と b の間の角 θ <input type="range" id="th1" min="0" max="180" value="60" step="1"> <output id="th1o"></output></label>
+        </div>
+        <div class="sim-controls">
+          <label>a を回す <input type="range" id="rot1" min="0" max="360" value="20" step="1"> <output id="rot1o"></output></label>
+          <label>b の長さ <input type="range" id="lb1" min="0.5" max="2" value="1.5" step="0.1"> <output id="lb1o"></output></label>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">「a を回す」で2本の矢印を丸ごと回しても、成分の掛け算の和で出した内積は変わらず、いつも |a||b|cos θ と同じになる。点線は b の「a の向きへの影」。θ が 90° を越えると影は反対側へ伸び、内積はマイナスになる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">θ が 90° のとき、内積はぴったり 0 になりました。90° より大きいとマイナスです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">cos 90°＝0 だからね。<strong>内積が 0 なら2本は直角</strong>、プラスなら鋭角、マイナスなら鈍角だ。もう1つ、図の点線に注目してほしい。a の長さが1のとき、a・b ＝ |b| cos θ は、<strong>b を a の向きへ落とした影の長さ</strong>になる。たとえば x の向きの長さ1の矢印 (1, 0, 0) と点 p の内積は、p の x 座標そのものだ。<strong>座標とは、軸の向きの矢印との内積</strong>だと言い換えられる。この見方は、骨盤から見た座標（ステージ3）や、カメラに写す計算（ステージ9）でもう一度使う。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">では、実際の右膝の角度を計算してみたいです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">よし。膝から股関節へのベクトルを t（太もも）、膝から足首へのベクトルを s（すね）として、cos θ ＝ t・s ÷ (|t| |s|) から角度を出す。下の図でコマを動かしてごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="チート900の右脚。太もものベクトル t とすねのベクトル s、内積から計算した膝の角度、外積 t×s の矢印（膝の曲がる軸）を表示。コマを動かすと、脚が伸び切ったところで外積の矢印が短くなり、向きが不安定になる"></canvas></div>
+        <div class="sim-controls">
+          <label>コマ <input type="range" id="k2" min="40" max="110" value="70" step="1"> <output id="k2o"></output></label>
+          <button class="sim-play" id="play2" type="button" aria-pressed="false">▶ 再生</button>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">赤が右脚。膝から股関節への t（太もも）と、膝から足首への s（すね）から、内積で膝の角度を計算する。紫の矢印は外積 t×s（見やすいように長さを2倍強にして描いている）。インパクト（約 1.32 秒）の前後で脚が伸び切ると、紫の矢印がほとんど消える。図はドラッグで回せる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">踏み切りのあとは膝が 70° くらいまで曲がって、インパクトの 1.32 秒ごろに 177° まで伸びています。数の表だけで膝の角度が分かるんですね。紫の矢印は何ですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">それが今日の2つ目の道具、<strong>外積</strong>だ。膝の角度が分かっても、<strong>膝がどちら向きに曲がっているか</strong>はまだ分からない。膝は蝶番（ちょうつがい）のように、決まった軸のまわりでしか曲がらない。その軸は、太ももとすねの<strong>両方に直角な向き</strong>だ。2本のベクトルの両方に直角な矢印を作る計算が外積で、記号は a×b と書く。<br><strong>a×b ＝ (a<sub>y</sub>b<sub>z</sub>−a<sub>z</sub>b<sub>y</sub>, a<sub>z</sub>b<sub>x</sub>−a<sub>x</sub>b<sub>z</sub>, a<sub>x</sub>b<sub>y</sub>−a<sub>y</sub>b<sub>x</sub>)</strong><br>内積と違って、答えはベクトルだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">式が複雑です。本当に a にも b にも直角になるんですか？ さっきの a＝(1, 2, 0)、b＝(3, −1, 2) で試してみます。a×b ＝ (2×2−0×(−1), 0×3−1×2, 1×(−1)−2×3) ＝ (4, −2, −7)。a との内積は 4−4＋0＝0、b との内積は 12＋2−14＝0。両方 0 なので、どちらとも直角です。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">うまく確かめられたね。文字のまま a・(a×b) を展開しても、項が2つずつ打ち消し合ってぴったり 0 になる。外積にはあと2つ、大事な性質がある。<strong>長さは |a| |b| sin θ</strong>で、これは a と b を2辺とする平行四辺形の面積に等しい。<strong>向きは右手の規則</strong>で決まる。右手の親指を a、人差し指を b の向きに合わせると、中指を立てた向きが a×b だ。だから順番を入れ替えると向きが逆になり、<strong>b×a ＝ −(a×b)</strong>。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <svg viewBox="0 0 400 250" width="100%" style="max-width:420px" role="img" aria-label="外積の図。ベクトル a と b が作る平行四辺形の面積が外積の長さ|a||b|sinθ。外積は平行四辺形の面に直角で、右手の規則で向きが決まる">
+          <polygon points="80,190 250,190 320,120 150,120" fill="rgba(122,79,176,.12)" stroke="#7a4fb0" stroke-width="1.4"/>
+          <line x1="80" y1="190" x2="250" y2="190" stroke="#c8433f" stroke-width="3"/>
+          <polygon points="250,190 240,185 240,195" fill="#c8433f"/>
+          <line x1="80" y1="190" x2="150" y2="120" stroke="#2f6fb8" stroke-width="3"/>
+          <polygon points="150,120 140,123 146,130" fill="#2f6fb8"/>
+          <line x1="80" y1="190" x2="80" y2="40" stroke="#7a4fb0" stroke-width="3"/>
+          <polygon points="80,40 75,52 85,52" fill="#7a4fb0"/>
+          <line x1="150" y1="120" x2="150" y2="190" stroke="#6a7684" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <path d="M108 190 A28 28 0 0 0 100 170" fill="none" stroke="#9a6a1c" stroke-width="1.6"/>
+          <text x="165" y="210" fill="#c8433f" font-size="14" font-weight="900" text-anchor="middle">a</text>
+          <text x="103" y="148" fill="#2f6fb8" font-size="14" font-weight="900">b</text>
+          <text x="112" y="183" fill="#9a6a1c" font-size="12" font-weight="900">θ</text>
+          <text x="156" y="160" fill="#6a7684" font-size="11.5" font-weight="800">高さ |b| sin θ</text>
+          <text x="92" y="48" fill="#7a4fb0" font-size="14" font-weight="900">a×b</text>
+          <text x="232" y="150" fill="#7a4fb0" font-size="12" font-weight="900" text-anchor="middle">面積 ＝ |a| |b| sin θ</text>
+          <text x="200" y="238" fill="#1b232c" font-size="12" font-weight="800" text-anchor="middle">a×b は面に直角。右手の親指＝a、人差し指＝b のとき、中指の向き</text>
+        </svg>
+        <div class="diagram-caption">a と b を2辺とする平行四辺形の面積は「底辺 |a| × 高さ |b| sin θ」。外積 a×b は、長さがこの面積、向きは面に直角（右手の規則）。a と b が同じ向き・反対向き（θ が 0° か 180°）のときは平行四辺形がつぶれて面積 0、外積も長さ 0 になる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">平行四辺形がつぶれると外積の長さが 0……。ということは、脚がまっすぐ伸び切って、太ももとすねが一直線になると、外積はほとんど 0 になってしまいます。さっきの図で、インパクトの前後で紫の矢印が消えかけていたのはそのせいですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。そして、ここに落とし穴がある。外積の長さがほとんど 0 のときは、点の位置がほんの数 mm ずれるだけで、外積の<strong>向き</strong>がくるっと変わってしまう。長さ 1 m の棒の向きは少し押しても変わらないが、長さ 1 mm の棒は少し押しただけで反対を向くのと同じだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">向きが変わると、何が困るんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">このアニメーションを作るとき、インパクトの瞬間に膝を伸ばし切る計算を、外積で求めた「膝の蝶番の軸」のまわりに、すねを回して行っていた。ところが脚がほぼ伸び切ったコマでは、その軸の向きが1コマおきに裏返ってしまい、<strong>つま先が1コマごとにジグザグに動く</strong>という不具合が出た。どう直したかはステージ5で話そう。今日の大事な点は、<strong>外積の向きは、外積が短いときには信用できない</strong>ということだ。</div>
+        </div>
+      </div>
+
+      <div class="note-box"><span class="nb-title">💡 内積と外積の使い分け</span><strong>内積</strong>：答えは数。2本の間の角度（cos θ）や、ある向きへの影の長さ（成分）を知りたいときに使う。<br><strong>外積</strong>：答えはベクトル。2本の両方に直角な向き（回転の軸や、面の向き）と、2本が作る平行四辺形の面積（sin θ）を知りたいときに使う。2本がほぼ平行なときは向きが不安定になる。</div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">内積：<span class="nw">a・b ＝ a<sub>x</sub>b<sub>x</sub>＋a<sub>y</sub>b<sub>y</sub>＋a<sub>z</sub>b<sub>z</sub> ＝ |a| |b| cos θ</span>（|a−b|² ＝ |a|²＋|b|²−2 a・b と、回しても長さが変わらないことから）</span>
+        <span class="step">角度：<span class="nw">cos θ ＝ a・b ÷ (|a| |b|)</span>。内積 0 なら直角、プラスなら鋭角、マイナスなら鈍角。膝の角度は、膝→股関節と膝→足首の2本から</span>
+        <span class="step">長さ1の矢印との内積は、その向きへの影の長さ（成分）。座標は軸の向きの矢印との内積</span>
+        <span class="step">外積：<span class="nw">a×b ＝ (a<sub>y</sub>b<sub>z</sub>−a<sub>z</sub>b<sub>y</sub>, a<sub>z</sub>b<sub>x</sub>−a<sub>x</sub>b<sub>z</sub>, a<sub>x</sub>b<sub>y</sub>−a<sub>y</sub>b<sub>x</sub>)</span>。a と b の両方に直角、長さは |a| |b| sin θ（平行四辺形の面積）、向きは右手の規則、<span class="nw">b×a ＝ −(a×b)</span></span>
+        <span class="step">膝の曲がる軸＝太もも×すね。脚が伸び切ると外積がほぼ 0 になり、向きが不安定になる（つま先のジグザグの原因）</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. a＝(1, 2, 0)、b＝(3, −1, 2) の内積 a・b は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">1</button>
+          <button class="choice-btn">5</button>
+          <button class="choice-btn">7</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 同じ成分どうしを掛けて足す：1×3 ＋ 2×(−1) ＋ 0×2 ＝ 3 − 2 ＋ 0 ＝ 1。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 2本のベクトルの内積が 0 のとき、2本の間の角度は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">0°（同じ向き）</button>
+          <button class="choice-btn">180°（反対向き）</button>
+          <button class="choice-btn">90°（直角）</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ a・b ＝ |a| |b| cos θ が 0 で、長さが 0 でなければ cos θ ＝ 0、つまり θ ＝ 90°。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 脚がまっすぐ伸び切ったとき、太もも×すね（外積）はどうなる？</p>
+        <div class="choice-list">
+          <button class="choice-btn">長さが最大になる</button>
+          <button class="choice-btn">長さがほぼ 0 になり、向きが決まらなくなる</button>
+          <button class="choice-btn">太ももと同じ向きになる</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 外積の長さは |a| |b| sin θ。一直線（θ＝180°）では sin θ ＝ 0 なので長さ 0。長さがほぼ 0 のときは、点のわずかなずれで向きが裏返ってしまう。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(2);</script>
+<script>
+/* ---------- シミュレータ1：内積（2D） ---------- */
+(function(){
+  var th=60, rot=20, lb=1.5, la=1.2, st;
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W,H)/4.6, O={x:W/2,y:H*0.56};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1;
+    for(var i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(O.x+i*s/2*1,0);ctx.lineTo(O.x+i*s/2,H);ctx.stroke();ctx.beginPath();ctx.moveTo(0,O.y+i*s/2);ctx.lineTo(W,O.y+i*s/2);ctx.stroke();}
+    ctx.strokeStyle=PE.C.axis; ctx.beginPath(); ctx.moveTo(0,O.y); ctx.lineTo(W,O.y); ctx.moveTo(O.x,0); ctx.lineTo(O.x,H); ctx.stroke();
+    PE.text(ctx,W-10,O.y-10,'x',PE.C.muted,12,900,'right'); PE.text(ctx,O.x+10,12,'y',PE.C.muted,12,900,'left');
+    var r=PE.rad(rot), t=PE.rad(th);
+    var a=[la*Math.cos(r),la*Math.sin(r)], b=[lb*Math.cos(r+t),lb*Math.sin(r+t)];
+    var P=function(v){return {x:O.x+v[0]*s,y:O.y-v[1]*s};};
+    // 影
+    var ua=[Math.cos(r),Math.sin(r)], sh=b[0]*ua[0]+b[1]*ua[1], foot=[ua[0]*sh,ua[1]*sh];
+    var F=P(foot), B=P(b), A0=P([-ua[0]*2.2,-ua[1]*2.2]), A1=P([ua[0]*2.2,ua[1]*2.2]);
+    ctx.strokeStyle='#d8cfbf'; ctx.setLineDash([2,4]); ctx.beginPath(); ctx.moveTo(A0.x,A0.y); ctx.lineTo(A1.x,A1.y); ctx.stroke();
+    ctx.strokeStyle=PE.C.muted; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(F.x,F.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=PE.C.gold; ctx.lineWidth=5; ctx.globalAlpha=.55; ctx.beginPath(); ctx.moveTo(O.x,O.y); ctx.lineTo(F.x,F.y); ctx.stroke(); ctx.globalAlpha=1;
+    var Ap=P(a); PE.arrowPx(ctx,O.x,O.y,Ap.x,Ap.y,PE.C.legR,3,10); PE.arrowPx(ctx,O.x,O.y,B.x,B.y,PE.C.z,3,10);
+    PE.text(ctx,Ap.x+ua[0]*14,Ap.y-ua[1]*14,'a',PE.C.legR,14,900); PE.text(ctx,B.x+(b[0]/lb)*14,B.y-(b[1]/lb)*14,'b',PE.C.z,14,900);
+    ctx.strokeStyle=PE.C.gold; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(O.x,O.y,26,-r,-(r+t),true); ctx.stroke();
+    PE.text(ctx,O.x+38*Math.cos(r+t/2),O.y-38*Math.sin(r+t/2),'θ',PE.C.gold,13,900);
+    var dot=a[0]*b[0]+a[1]*b[1];
+    PE.text(ctx,10,16,'a = ('+PE.fmt(a[0],2)+', '+PE.fmt(a[1],2)+')　b = ('+PE.fmt(b[0],2)+', '+PE.fmt(b[1],2)+')',PE.C.ink,12,900,'left');
+    document.getElementById('ro1').innerHTML='<span>成分で：a<sub>x</sub>b<sub>x</sub>＋a<sub>y</sub>b<sub>y</sub> = <b>'+PE.fmt(dot,3)+'</b></span><span>|a||b|cos θ = '+PE.fmt(la,1)+'×'+PE.fmt(lb,1)+'×'+PE.fmt(Math.cos(t),3)+' = <b>'+PE.fmt(la*lb*Math.cos(t),3)+'</b></span><span>影の長さ |b|cos θ = <b>'+PE.fmt(sh,3)+'</b></span>';
+  }
+  st=PE.canvas('cv1',0.62,draw);
+  PE.bindRange('th1','th1o',function(v){return v+'°';},function(v){th=v;st.redraw();});
+  PE.bindRange('rot1','rot1o',function(v){return v+'°';},function(v){rot=v;st.redraw();});
+  PE.bindRange('lb1','lb1o',function(v){return PE.fmt(v,1);},function(v){lb=v;st.redraw();});
+})();
+
+/* ---------- シミュレータ2：右脚の膝の角度（内積）と曲がる軸（外積） ---------- */
+(function(){
+  var k=70, st, cam, prevAx=null;
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var p=PE.pose(k), c=PE.com(k); cam.target=[p.kneeR[0],Math.max(0.6,p.kneeR[1]),p.kneeR[2]];
+    PE.floor(ctx,cam,c[0]-2,c[0]+2,-1.5,1.5,0.5);
+    PE.drawBody(ctx,cam,p,{alpha:0.35,thin:true});
+    var t=PE.sub(p.hipR,p.kneeR), s=PE.sub(p.ankleR,p.kneeR), n=PE.cross(t,s);
+    var cosv=PE.dot(t,s)/(PE.len(t)*PE.len(s)), ang=PE.deg(Math.acos(Math.max(-1,Math.min(1,cosv))));
+    var K=cam.proj(p.kneeR), Hh=cam.proj(p.hipR), A=cam.proj(p.ankleR);
+    PE.arrowPx(ctx,K.x,K.y,Hh.x,Hh.y,PE.C.legR,4,10); PE.arrowPx(ctx,K.x,K.y,A.x,A.y,'#e07a5f',4,10);
+    PE.text(ctx,(K.x+Hh.x)/2+10,(K.y+Hh.y)/2,'t',PE.C.legR,14,900,'left'); PE.text(ctx,(K.x+A.x)/2+10,(K.y+A.y)/2,'s',PE.C.legR,14,900,'left');
+    var N=cam.proj(PE.add(p.kneeR,PE.mul(n,2.2)));
+    PE.arrowPx(ctx,K.x,K.y,N.x,N.y,PE.C.armL,3,9); PE.text(ctx,N.x+8,N.y,'t×s',PE.C.armL,12.5,900,'left');
+    var flip=prevAx&&PE.dot(prevAx,n)<0; prevAx=n;
+    PE.text(ctx,10,16,'t = '+PE.fmt(k/PE.fps,3)+' 秒（コマ '+k+'）',PE.C.ink,12,900,'left');
+    PE.text(ctx,10,34,'膝の角度 '+PE.fmt(ang,0)+'°',PE.C.legR,13,900,'left');
+    document.getElementById('ro2').innerHTML='<span>t・s = <b>'+PE.fmt(PE.dot(t,s),3)+'</b></span><span>|t| = <b>'+PE.fmt(PE.len(t),3)+'</b>　|s| = <b>'+PE.fmt(PE.len(s),3)+'</b></span><span>cos θ = <b>'+PE.fmt(cosv,3)+'</b> → θ = <b>'+PE.fmt(ang,1)+'°</b></span><span>外積の長さ |t×s| = <b>'+PE.fmt(PE.len(n),3)+'</b></span>';
+  }
+  st=PE.canvas('cv2',0.72,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:65,pitch:12,dist:3.2,target:[0.8,0.8,0],scale:0.9});
+  var el=PE.bindRange('k2','k2o',function(v){return PE.fmt(v/PE.fps,2)+' 秒';},function(v){k=v;prevAx=null;st.redraw();});
+  var ft=k; PE.player(document.getElementById('play2'),function(dt){ft+=dt*PE.fps*0.25; if(ft>110)ft=40; el.set(Math.floor(ft));});
+  el.addEventListener('input',function(){ft=parseFloat(el.value);});
+  st.redraw();
+})();
+</script>
+</body>
+</html>

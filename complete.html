@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>全ステージクリア ― チート900を数式で動かす</title>
+<meta name="description" content="チート900を数式で動かす、全9ステージクリアおめでとう。ここまでの旅を振り返ろう。">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/complete">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="全ステージクリア ― チート900を数式で動かす">
+<meta property="og:description" content="全9ステージクリアおめでとう。旅を振り返ろう。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/complete">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+</head>
+<body>
+<div class="shell">
+  <nav class="topbar" aria-label="サイト情報">
+    <a class="brand-badge" href="index.html" title="トップへ" aria-label="トップへ" style="text-decoration:none">🥋</a>
+    <span class="brand-copy">
+      <strong>チート900を数式で動かす</strong>
+      <small>PHYSICS ENGINE QUEST</small>
+    </span>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <h1><span class="line">数の表が、空中で2回転半した。</span></h1>
+      <p>座標と速さ、内積と外積、回転行列、四元数、2関節IK、重心と放物線、角運動量と慣性テンソル、フィルタ、そして投影と最小二乗。きみは、チート900の3Dアニメーションを動かしていた計算を、ひとつずつ自分の手で確かめた。旅の記録で振り返ろう。</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="board" aria-labelledby="recap-heading">
+      <div class="board-head">
+        <div><h2 id="recap-heading">ここまでの旅を振り返ろう</h2></div>
+      </div>
+
+      <div class="recap-list">
+        <div class="recap-item">
+          <span class="recap-num">1</span>
+          <div class="recap-body"><span class="recap-title">動きは数の表。</span> <span class="recap-desc">アニメーションは24個の点の (x, y, z) を1秒に60回並べた表。コマの差 ÷ 時間で速さ、速さの差 ÷ 時間で加速度。空中の重心は −9.8 m/s² で落ちる。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">2</span>
+          <div class="recap-body"><span class="recap-title">長さと角度を測る。</span> <span class="recap-desc">ベクトルの長さは三平方の定理。内積 a·b ＝ |a||b|cos θ で膝の角度、外積 a×b で両方に直角な向き（膝がどちらへ曲がるか）。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">3</span>
+          <div class="recap-body"><span class="recap-title">回転を表す。</span> <span class="recap-desc">回転行列は、回したあとの x・y・z 軸の3本の矢印を並べた表。腰の右向きと上向きから外積で前向きを作り、体の座標系を組み立てる。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">4</span>
+          <div class="recap-body"><span class="recap-title">向きをなめらかにつなぐ。</span> <span class="recap-desc">四元数 q ＝ (cos(θ/2), 軸 × sin(θ/2)) で向きを表し、球面補間でなめらかにつなぐ。q と −q は同じ向き。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">5</span>
+          <div class="recap-body"><span class="recap-title">膝の置き場所。</span> <span class="recap-desc">股関節と足首が決まれば、余弦定理で膝の位置が決まる（2関節IK）。脚が伸び切ると膝の向きが決まらなくなる。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">6</span>
+          <div class="recap-body"><span class="recap-title">空中の重心。</span> <span class="recap-desc">重心は体の部分の重みつき平均。空中では y ＝ y₀ ＋ v₀t − 4.9t² の放物線から外れられない。離陸と着地から放物線を1本に決め、体全体を平行移動して直す。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">7</span>
+          <div class="recap-body"><span class="recap-title">縮めると速く回る。</span> <span class="recap-desc">角運動量 L ＝ Iω は空中で変わらない。縮めると速く、脚を伸ばすと遅く回る（約 860°/秒 → 440°/秒）。軸の向きごとの回しにくさは慣性テンソル nᵀ𝐈n。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">8</span>
+          <div class="recap-body"><span class="recap-title">ならすと何が変わる。</span> <span class="recap-desc">ガウスフィルタは前後のコマの重みつき平均。ならすとピークが下がり、過去だけ使うと遅れる。位置をならすと骨が縮むので、股関節から足首への向きだけをならす。</span></div>
+        </div>
+        <div class="recap-item">
+          <span class="recap-num">9</span>
+          <div class="recap-body"><span class="recap-title">動画に重ねる。</span> <span class="recap-desc">投影は内積3つと奥行きでの割り算。光の通り道に沿って動かしても画面上は動かない。ずれの2乗の合計を最小にする最小二乗法で、重みをつけて動画に重ねた。</span></div>
+        </div>
+      </div>
+
+      <div class="complete-actions">
+        <a class="btn btn-primary" href="https://acst-bj.com/tricks/cheat-900-kick/" target="_blank" rel="noopener">🥋 完成したチート900の3D図解を見る →</a>
+      </div>
+
+      <div class="complete-actions">
+        <a class="btn btn-primary" id="btn-share" href="#" target="_blank" rel="noopener">𝕏 クリアをシェアする</a>
+        <a class="btn" href="index.html">トップに戻る →</a>
+        <button class="btn" id="btn-reset-all">🔄 進捗をリセットして最初から</button>
+      </div>
+    </section>
+
+    <section class="board" aria-labelledby="next-heading" style="margin-top:16px">
+      <div class="board-head">
+        <div><h2 id="next-heading">バックナンバー</h2></div>
+        <p>同じねこ博士とうさ美が案内する、姉妹サイトの学習クエスト</p>
+      </div>
+      <div class="quest-grid">
+        <a class="quest-card" href="https://rotary-engine.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#3d5f88;--accent-bg:#e6eef7">
+          <div class="q-top"><span class="q-num">⚙</span><span class="q-suit" aria-hidden="true">🍙</span></div>
+          <div class="q-meta"><span class="q-tag">作図</span><span class="q-time">全8ステージ</span></div>
+          <div class="q-title">ロータリーエンジンを作図する</div>
+          <p class="q-desc">繭形のハウジングと三角おむすびのローターを、座標と cos・sin だけで描く。このサイトで使う「点を式で作る」の練習にもなる。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+        <a class="quest-card" href="https://complex-number.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#5b3fa6;--accent-bg:#efe9f9">
+          <div class="q-top"><span class="q-num">i</span><span class="q-suit" aria-hidden="true">🌀</span></div>
+          <div class="q-meta"><span class="q-tag">複素数</span><span class="q-time">全8ステージ</span></div>
+          <div class="q-title">本当はおもしろい複素数の世界</div>
+          <p class="q-desc">cos と sin の出どころと、「掛け算は回転」という見方。このサイトの四元数は、複素数を3D の回転へ広げたもの。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+        <a class="quest-card" href="https://quantum-mechanics.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#1f7488;--accent-bg:#e4f2f5">
+          <div class="q-top"><span class="q-num">⚛</span><span class="q-suit" aria-hidden="true">🌌</span></div>
+          <div class="q-meta"><span class="q-tag">量子力学</span><span class="q-time">全9クエスト</span></div>
+          <div class="q-title">量子力学、冒険の書</div>
+          <p class="q-desc">二重スリットから量子コンピュータの回路作りまで、9つのクエストでたどる量子力学のシリーズマップ。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+      </div>
+    </section>
+    <div id="book-recommend"></div>
+  </main>
+
+  <footer>
+    <p>NO DOWNLOAD. NO REGISTRATION. JUST LEARN. &nbsp;© <span id="year"></span> ruglerugle</p>
+    <div class="footer-suits" aria-hidden="true"><span>🎞️</span><span>📐</span><span>🔄</span><span>🌀</span></div>
+  </footer>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("btn-share").href =
+    "https://twitter.com/intent/tweet?text=" +
+    encodeURIComponent("「チート900を数式で動かす」全9ステージをクリア！ ベクトル・回転行列・四元数・角運動量で、空中2回転半の蹴り技が動く仕組みがわかりました🥋") +
+    "&url=" + encodeURIComponent("https://physics-engine.habatakijuku.com/");
+</script>
+<script src="js/progress.js?v=20261018a"></script>
+<script>RQ.initCompletePage();</script>
+</body>
+</html>

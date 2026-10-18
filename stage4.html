@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE4 向きをなめらかにつなぐ（四元数） ― チート900を数式で動かす</title>
+<meta name="description" content="2つの向きの「途中」や「平均」を作るには、回転行列をそのまま混ぜるとうまくいかない。複素数を3次元の回転に広げた四元数で、回転を4つの数で表し、q と −q が同じ向きになること、球面に沿ってつなぐ slerp を、チート900の体で確かめる。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage4">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE4 向きをなめらかにつなぐ（四元数） ― チート900を数式で動かす">
+<meta property="og:description" content="向きの途中や平均を作るには四元数。回転を4つの数で表し、球面に沿ってなめらかにつなぐ slerp を、チート900の体で確かめる。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage4">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE4 向きをなめらかにつなぐ",
+      "description": "2つの向きの「途中」や「平均」を作るには、回転行列をそのまま混ぜるとうまくいかない。複素数を3次元の回転に広げた四元数で、回転を4つの数で表し、q と −q が同じ向きになること、球面に沿ってつなぐ slerp を、チート900の体で確かめる。",
+      "url": "https://physics-engine.habatakijuku.com/stage4",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 4,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE4 向きをなめらかにつなぐ",
+          "item": "https://physics-engine.habatakijuku.com/stage4"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 4 ― 向きをなめらかにつなぐ ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 4</span><h1 class="chapter-title">向きをなめらかにつなぐ</h1>
+        <div class="chapter-sub">四元数</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">回転行列の数をそのまま混ぜると体がつぶれてしまう理由を知り、回転を4つの数で表す<strong>四元数</strong>を身につけよう。<strong>q と −q が同じ向き</strong>を表すことと、2つの向きを球面に沿ってつなぐ <strong>slerp</strong> を説明できれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">アニメーションを作っていると、「2つの向きの<strong>途中</strong>の向き」がほしくなる場面がよくある。たとえば踏み切りの瞬間、床を離れる足の向きを、前のコマの向きから少し後のコマの向きへ、なめらかにつなぎたい。空中で体の向きが細かく揺れているのを、前後のコマの向きの<strong>平均</strong>でならしたい。向きは回転行列で表せるのだから、2つの行列の数を、ふつうの数のように平均すればいい――と思うだろう？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">はい。行列は数の箱なので、同じ場所どうしを足して2で割れば、真ん中の向きになりそうです。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">試してみよう。体を上向きの軸のまわりに 0° 回した向きと、180° 回した向きの「平均」を作る。0° の回転行列の左の列（x の矢印の行き先）は (1, 0, 0)、180° の回転行列の左の列は (−1, 0, 0) だ。平均すると？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">(1＋(−1))÷2 ＝ 0 ……。x の矢印が (0, 0, 0)、長さ 0 になってしまいました。真ん中は 90° 回った向きのはずなのに、矢印が消えてしまうなんて。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">180° ほど極端でなくても同じことが起きる。行列の数をそのまま混ぜると、3本の矢印が<strong>縮んだり、直角でなくなったり</strong>して、もう回転ではなくなる。体に当てはめると、体がつぶれたり、ゆがんだりする。下の図で「行列の数を混ぜる」を選んで確かめてごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="向き A（灰色）から向き B（薄い紫）への途中の向き。行列の数を混ぜると体がつぶれ、四元数の slerp では形を保ったまま回る"></canvas></div>
+        <div class="sim-controls">
+          <label>B の回し方（角度） <input type="range" id="ang1" min="0" max="180" value="150" step="1"> <output id="ang1o"></output></label>
+          <label>途中の割合 t <input type="range" id="t1" min="0" max="1" value="0.5" step="0.01"> <output id="t1o"></output></label>
+        </div>
+        <div class="sim-controls" id="mode1">
+          <button class="btn" type="button" data-m="mat" aria-pressed="true">行列の数を混ぜる</button>
+          <button class="btn" type="button" data-m="slerp" aria-pressed="false">四元数の slerp</button>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">灰色が向き A、薄い紫が向き B（A をななめの軸のまわりに回したもの）。濃い色が「途中の割合 t」の向き。行列の数を混ぜると、矢印が縮んで体がつぶれる（右下の数値：x の矢印の長さと、x・y の矢印の内積）。slerp なら、長さ1・直角のまま回っていく。図はドラッグで回せる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">行列を混ぜると、体が薄っぺらくなりました。slerp というほうは、形を保ったまま回っていきます。これは何ですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">それを説明するために、まず平面の回転を思い出そう。『本当はおもしろい複素数の世界』で学んだように、平面の回転は、長さ1の複素数 cos φ ＋ i sin φ を掛けることだった。複素数は2つの数（実部と虚部）で1つの回転を表す。1843年、アイルランドの数学者ハミルトンは、これを3次元の回転に広げる数を考えた。i のほかに j と k という2つの「虚数」を加えて、<strong>w ＋ x i ＋ y j ＋ z k</strong> という4つの数の組を作り、i² ＝ j² ＝ k² ＝ ijk ＝ −1 という掛け算の決まりを置いた。これを<strong>四元数（しげんすう）</strong>という。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">4つの数で回転を表すんですか？ 回転行列は 9 個の数でした。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう、ずっと少ない。軸の向きが長さ1の矢印 k ＝ (k<sub>x</sub>, k<sub>y</sub>, k<sub>z</sub>)、回す角度が θ の回転は、次の四元数で表す。<br><strong>q ＝ ( cos(θ/2), k<sub>x</sub> sin(θ/2), k<sub>y</sub> sin(θ/2), k<sub>z</sub> sin(θ/2) )</strong><br>最初の数が w、残りの3つが x、y、z だ。4つの数の2乗の和は cos²(θ/2) ＋ sin²(θ/2)×(k<sub>x</sub>²＋k<sub>y</sub>²＋k<sub>z</sub>²) ＝ cos²(θ/2) ＋ sin²(θ/2) ＝ 1。<strong>回転を表す四元数は、いつも「長さ」が1</strong>になる。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">θ ではなくて θ/2、半分の角度が出てくるのはなぜですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">四元数で点（ベクトル v）を回すときは、v を四元数 (0, v<sub>x</sub>, v<sub>y</sub>, v<sub>z</sub>) とみなして、<strong>q v q*</strong> と、左から q、右から q* を掛ける（q* は、x・y・z の符号を反対にした四元数）。ちょうど両側から挟むので、それぞれが角度の半分ずつ受け持って、合わせて θ 回る。計算すると、ステージ3のロドリゲスの公式と同じ答えになる。下の図でも確かめられるよ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="軸と角度から作った四元数 q の4つの数と、q v q* で回した右つま先が、ロドリゲスの公式で回した位置と一致することを表示。θ を 360° 動かすと q は −q になるのに、向きは元に戻る"></canvas></div>
+        <div class="sim-controls">
+          <label>回す角度 θ <input type="range" id="th2" min="0" max="720" value="120" step="1"> <output id="th2o"></output></label>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">軸はななめ上向きに固定。上段は四元数 q の4つの数（w, x, y, z）。下段は、右つま先を q v q* で回した位置と、ステージ3のロドリゲスの公式で回した位置。θ を 360° を越えて動かすと、体は1周して元の向きに戻るのに、q の4つの数はすべて符号が反対（−q）になる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">θ が 360° のとき、体は元の向きに戻っているのに、q は (1, 0, 0, 0) ではなく (−1, 0, 0, 0) になりました。720° でやっと (1, 0, 0, 0) に戻ります。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">半分の角度を使うから、角度が 360° 増えると cos と sin の中身は 180° 増えて、4つの数の符号がそろって反転する。つまり<strong>q と −q は、まったく同じ向きを表す</strong>。1つの向きに、2つの名前があるんだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">同じ向きに2つの名前があると、何か困るんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">平均を作るときに困る。向き A を q、向き B を q' とし、2つがほとんど同じ向きだとしよう。もし B のほうを −q' という名前で持っていたら、q と −q' はほとんど正反対の4つの数だから、足して2で割ると 0 に近くなってしまう。だから平均や途中を作る前に、<strong>2つの四元数の4次元の内積</strong>（4つの数を掛けて足したもの）を調べ、<strong>マイナスなら片方の符号を反転してから</strong>混ぜる。このアニメーションで空中の体の向きの揺れをならしたときも、コマごとの四元数を、前のコマとの内積がプラスになるようにそろえてから平均している。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">符号をそろえたら、四元数の4つの数はそのまま平均してもいいんですか？ 行列のときは、混ぜると壊れてしまいましたけど。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">いいところに気づいたね。長さ1の四元数は、すべて「4次元の空間の、半径1の球面」の上にある。4つの数をそのまま平均すると、点は球面の内側にもぐって長さが1より短くなるが、<strong>長さで割って1に戻せば、ちゃんと回転を表す</strong>。行列とちがって、四元数は「縮んだら長さを1に戻す」だけで直せるんだ。さらに丁寧なのが <strong>slerp（スラープ）</strong>で、2つの点を結ぶ球面上のいちばん短い道（大円の弧）に沿って、一定の速さで進む。q₀ と q₁ の4次元の内積を cos Ω とすると、割合 t の途中は<br><strong>q(t) ＝ ( sin((1−t)Ω) q₀ ＋ sin(tΩ) q₁ ) ÷ sin Ω</strong><br>t＝0 なら q₀、t＝1 なら q₁ になり、その間は等しい角度ずつ回っていく。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="四元数の大きな円（4次元の球面を、2つの四元数を通る平面で切った断面）。q0 から q1 へ、slerp は円周に沿って進み、そのまま混ぜると円の内側を通る。符号をそろえないと遠回りになる"></canvas></div>
+        <div class="sim-controls">
+          <label>2つの向きの差（角度） <input type="range" id="d3" min="0" max="180" value="100" step="1"> <output id="d3o"></output></label>
+          <label>途中の割合 t <input type="range" id="t3" min="0" max="1" value="0.5" step="0.01"> <output id="t3o"></output></label>
+        </div>
+        <div class="sim-controls" id="sign3">
+          <button class="btn" type="button" data-s="1" aria-pressed="true">q₁ のまま</button>
+          <button class="btn" type="button" data-s="-1" aria-pressed="false">−q₁ という名前で持つ</button>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">4次元の球面を、q₀ と q₁ を通る平面で切った断面（半径1の円）。紫の点が slerp の途中（円周の上を一定の速さで進む）、灰色の点が4つの数をそのまま混ぜた途中（円の内側にもぐる）。「−q₁ という名前で持つ」と、同じ向きなのに円の反対側の点になり、そのまま混ぜると遠回り（360° から差を引いた角度）になってしまう</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">符号をそろえないと遠回りになるんですね。四元数の内積がマイナスのときに符号を反転するのは、近いほうの名前を選ぶため、ということですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。まとめると、向きを扱うときは<strong>計算や表示には回転行列、混ぜたりならしたりするには四元数</strong>、と使い分けるといい。行列と四元数は、いつでもお互いに変換できる。このアニメーションでは、踏み切りで床を離れる足の向きを slerp でつなぎ、空中の体の向きの揺れを、符号をそろえた四元数の平均でならしている。</div>
+        </div>
+      </div>
+
+      <div class="note-box"><span class="nb-title">💡 角度3つ（オイラー角）ではだめなの？</span>向きを「左右に何度・上下に何度・ひねり何度」の3つの角度で表す方法（オイラー角）もある。数が3つで分かりやすいが、上下の角度が ±90° に近づくと、左右の角度とひねりの角度が同じ回転を表してしまい、角度が1つに決まらなくなる（ジンバルロックと呼ばれる）。そこでは、角度をなめらかに変えても向きが急に飛ぶ。空中で回り続けるチート900のような動きでは、四元数のほうが安全だ。</div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">回転行列の数をそのまま混ぜると、矢印が縮んだり直角でなくなったりして、回転でなくなる（体がつぶれる）</span>
+        <span class="step">四元数：軸 k・角度 θ の回転は <span class="nw">q ＝ (cos(θ/2), k sin(θ/2))</span>。4つの数の2乗の和はいつも 1。点は <span class="nw">q v q*</span> で回す（ロドリゲスの公式と同じ結果）</span>
+        <span class="step">q と −q は同じ向き（角度を 360° 増やすと符号がそろって反転する）。混ぜる前に4次元の内積を見て、マイナスなら片方を反転する</span>
+        <span class="step">slerp：<span class="nw">q(t) ＝ (sin((1−t)Ω) q₀ ＋ sin(tΩ) q₁) ÷ sin Ω</span>（cos Ω ＝ q₀・q₁）。球面の上を一定の速さで進む。そのまま混ぜて長さを1に戻すだけでも、角度が小さければほぼ同じ</span>
+        <span class="step">計算や表示には回転行列、混ぜる・ならすには四元数</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 長さ1の軸 k のまわりに角度 θ 回す回転を表す四元数は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">(cos θ, k sin θ)</button>
+          <button class="choice-btn">(cos(θ/2), k sin(θ/2))</button>
+          <button class="choice-btn">(θ, k)</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 点を q v q* と両側から挟んで回すので、四元数には半分の角度 θ/2 が入る。4つの数の2乗の和は cos²(θ/2)＋sin²(θ/2)＝1。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 四元数 q と −q（4つの数の符号をすべて反対にしたもの）は、どんな向きを表す？</p>
+        <div class="choice-list">
+          <button class="choice-btn">逆向きの回転</button>
+          <button class="choice-btn">角度が2倍の回転</button>
+          <button class="choice-btn">まったく同じ向き</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 角度を 360° 増やすと半分の角度は 180° 増え、4つの数の符号がそろって反転するが、向きは1周して元に戻る。だから混ぜる前に符号をそろえる必要がある。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 2つの向きの「途中」を作るとき、回転行列の数をそのまま混ぜないのはなぜ？</p>
+        <div class="choice-list">
+          <button class="choice-btn">混ぜると矢印が縮んだり直角でなくなったりして、回転でなくなるから</button>
+          <button class="choice-btn">計算が遅くなるから</button>
+          <button class="choice-btn">行列どうしは足し算できないから</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 0° と 180° の回転行列を混ぜると x の矢印が (0, 0, 0) になってしまうように、混ぜた行列は回転を表さない。四元数なら、長さを1に戻すか slerp を使えばよい。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(4);</script>
+<script>
+/* ---------- 四元数の道具 ---------- */
+var Q={
+  axis:function(k,th){var s=Math.sin(th/2);return [Math.cos(th/2),k[0]*s,k[1]*s,k[2]*s];},
+  mul:function(a,b){return [a[0]*b[0]-a[1]*b[1]-a[2]*b[2]-a[3]*b[3], a[0]*b[1]+a[1]*b[0]+a[2]*b[3]-a[3]*b[2], a[0]*b[2]-a[1]*b[3]+a[2]*b[0]+a[3]*b[1], a[0]*b[3]+a[1]*b[2]-a[2]*b[1]+a[3]*b[0]];},
+  conj:function(q){return [q[0],-q[1],-q[2],-q[3]];},
+  rot:function(q,v){var r=Q.mul(Q.mul(q,[0,v[0],v[1],v[2]]),Q.conj(q));return [r[1],r[2],r[3]];},
+  dot:function(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3];},
+  norm:function(q){var l=Math.sqrt(Q.dot(q,q))||1;return q.map(function(x){return x/l;});},
+  slerp:function(a,b,t){var c=Math.max(-1,Math.min(1,Q.dot(a,b))),O=Math.acos(c);if(O<1e-6)return a.slice();var s=Math.sin(O);return a.map(function(x,i){return (Math.sin((1-t)*O)*x+Math.sin(t*O)*b[i])/s;});},
+  mat:function(q){return [Q.rot(q,[1,0,0]),Q.rot(q,[0,1,0]),Q.rot(q,[0,0,1])];}  // 列（回った x・y・z の矢印）
+};
+function applyCols(cols,v){return PE.add(PE.add(PE.mul(cols[0],v[0]),PE.mul(cols[1],v[1])),PE.mul(cols[2],v[2]));}
+var K0=78, BASE=PE.pose(K0), CEN=PE.com(K0), AX=PE.norm([0.3,1,0.5]);
+function poseBy(fn){var o={};for(var n in BASE)o[n]=PE.add(CEN,fn(PE.sub(BASE[n],CEN)));return o;}
+
+/* ---------- シミュレータ1：行列を混ぜる vs slerp ---------- */
+(function(){
+  var ang=150, t=0.5, mode='mat', st, cam;
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    cam.target=CEN;
+    var qA=[1,0,0,0], qB=Q.axis(AX,PE.rad(ang)), cols;
+    if(mode==='mat'){ var A=Q.mat(qA), B=Q.mat(qB); cols=[0,1,2].map(function(i){return PE.lerp(A[i],B[i],t);}); }
+    else cols=Q.mat(Q.slerp(qA,qB,t));
+    PE.drawBody(ctx,cam,BASE,{alpha:0.18,thin:true});
+    PE.drawBody(ctx,cam,poseBy(function(v){return Q.rot(qB,v);}),{alpha:0.22,thin:true});
+    PE.drawBody(ctx,cam,poseBy(function(v){return applyCols(cols,v);}));
+    var C=cam.proj(CEN);
+    [[cols[0],PE.C.x,'x'],[cols[1],PE.C.y,'y'],[cols[2],PE.C.z,'z']].forEach(function(a){var T=cam.proj(PE.add(CEN,PE.mul(a[0],0.7)));PE.arrowPx(ctx,C.x,C.y,T.x,T.y,a[1],3,10);PE.text(ctx,T.x+6,T.y-6,a[2],a[1],12,900,'left');});
+    PE.text(ctx,10,16,mode==='mat'?'行列の数をそのまま混ぜた向き':'四元数の slerp で作った向き',PE.C.ink,12,900,'left');
+    document.getElementById('ro1').innerHTML='<span>x の矢印の長さ = <b>'+PE.fmt(PE.len(cols[0]),3)+'</b></span><span>y の矢印の長さ = <b>'+PE.fmt(PE.len(cols[1]),3)+'</b></span><span>x・y の矢印の内積 = <b>'+PE.fmt(PE.dot(cols[0],cols[1]),3)+'</b>（直角なら 0）</span>';
+  }
+  st=PE.canvas('cv1',0.72,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:65,pitch:18,dist:5.2,target:CEN,scale:0.95});
+  PE.bindRange('ang1','ang1o',function(v){return v+'°';},function(v){ang=v;st.redraw();});
+  PE.bindRange('t1','t1o',function(v){return PE.fmt(v,2);},function(v){t=v;st.redraw();});
+  document.querySelectorAll('#mode1 .btn').forEach(function(b){b.addEventListener('click',function(){mode=b.getAttribute('data-m');document.querySelectorAll('#mode1 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});st.redraw();});});
+  st.redraw();
+})();
+
+/* ---------- シミュレータ2：q v q* とロドリゲス、q と −q ---------- */
+(function(){
+  var th=120, st, cam;
+  function rodr(v,k,a){var c=Math.cos(a),s=Math.sin(a);return PE.add(PE.add(PE.mul(v,c),PE.mul(PE.cross(k,v),s)),PE.mul(k,PE.dot(k,v)*(1-c)));}
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    cam.target=CEN; var q=Q.axis(AX,PE.rad(th));
+    PE.drawBody(ctx,cam,BASE,{alpha:0.15,thin:true});
+    PE.drawBody(ctx,cam,poseBy(function(v){return Q.rot(q,v);}),{highlight:'toeR'});
+    var A=cam.proj(PE.add(CEN,PE.mul(AX,-1))), B=cam.proj(PE.add(CEN,PE.mul(AX,1.1))); PE.arrowPx(ctx,A.x,A.y,B.x,B.y,PE.C.armL,2.5,11); PE.text(ctx,B.x+8,B.y,'軸',PE.C.armL,12,900,'left');
+    var v=PE.sub(BASE.toeR,CEN), r1=Q.rot(q,v), r2=rodr(v,AX,PE.rad(th));
+    PE.text(ctx,10,16,'q = ( '+q.map(function(x){return PE.fmt(x,3);}).join(',  ')+' )',PE.C.armL,12.5,900,'left');
+    document.getElementById('ro2').innerHTML='<span>q v q* で回した右つま先 = (<b>'+r1.map(function(x){return PE.fmt(x,3);}).join(', ')+'</b>)</span><span>ロドリゲスの公式 = (<b>'+r2.map(function(x){return PE.fmt(x,3);}).join(', ')+'</b>)</span><span>4つの数の2乗の和 = <b>'+PE.fmt(Q.dot(q,q),3)+'</b></span>';
+  }
+  st=PE.canvas('cv2',0.7,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:65,pitch:18,dist:5.2,target:CEN,scale:0.95});
+  PE.bindRange('th2','th2o',function(v){return v+'°';},function(v){th=v;st.redraw();});
+  st.redraw();
+})();
+
+/* ---------- シミュレータ3：四元数の円（断面）と slerp・符号 ---------- */
+(function(){
+  var d=100, t=0.5, sg=1, st;
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var R=Math.min(W,H)*0.36, O={x:W/2,y:H/2+8};
+    ctx.strokeStyle=PE.C.axis; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(O.x,O.y,R,0,PE.TAU); ctx.stroke();
+    // 向きの差 d のとき、四元数どうしの角度は d/2
+    var a0=0, a1=sg>0?PE.rad(d/2):PE.rad(d/2)+Math.PI;
+    var P=function(a,r){return {x:O.x+Math.cos(a)*R*(r||1),y:O.y-Math.sin(a)*R*(r||1)};};
+    var p0=P(a0), p1=P(a1);
+    // slerp の弧と、そのまま混ぜた弦
+    var sweep=a1-a0; if(sweep>Math.PI) sweep-=PE.TAU;
+    ctx.strokeStyle=PE.C.armL; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(O.x,O.y,R,-a0,-(a0+sweep),sweep>0); ctx.stroke();
+    ctx.strokeStyle='#b9b0a3'; ctx.setLineDash([5,4]); ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.lineTo(p1.x,p1.y); ctx.stroke(); ctx.setLineDash([]);
+    var am=a0+sweep*t, ps=P(am);
+    var lin={x:p0.x+(p1.x-p0.x)*t,y:p0.y+(p1.y-p0.y)*t};
+    ctx.fillStyle='#9a948a'; ctx.beginPath(); ctx.arc(lin.x,lin.y,6,0,PE.TAU); ctx.fill();
+    ctx.fillStyle=PE.C.armL; ctx.beginPath(); ctx.arc(ps.x,ps.y,7,0,PE.TAU); ctx.fill();
+    [[p0,'q₀'],[p1,sg>0?'q₁':'−q₁']].forEach(function(e){ctx.fillStyle=PE.C.ink;ctx.beginPath();ctx.arc(e[0].x,e[0].y,5,0,PE.TAU);ctx.fill();PE.text(ctx,e[0].x+(e[0].x>=O.x?14:-14),e[0].y-12,e[1],PE.C.ink,13,900);});
+    var q1o=P(PE.rad(d/2)); if(sg<0){ctx.strokeStyle=PE.C.muted;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(q1o.x,q1o.y,5,0,PE.TAU);ctx.stroke();PE.text(ctx,q1o.x+14,q1o.y-12,'q₁',PE.C.muted,12,800);}
+    var linLen=Math.hypot(lin.x-O.x,lin.y-O.y)/R, travel=Math.abs(sweep)*2;
+    PE.text(ctx,10,16,'4次元の球面の断面（半径 1）',PE.C.muted,11.5,800,'left');
+    document.getElementById('ro3').innerHTML='<span>4次元の内積 q₀・q₁ = <b>'+PE.fmt(Math.cos(a1-a0),3)+'</b></span><span>slerp で回る向きの量 = <b>'+PE.fmt(PE.deg(travel),0)+'°</b></span><span>そのまま混ぜた点の長さ = <b>'+PE.fmt(linLen,3)+'</b></span>';
+  }
+  st=PE.canvas('cv3',0.62,draw);
+  PE.bindRange('d3','d3o',function(v){return v+'°';},function(v){d=v;st.redraw();});
+  PE.bindRange('t3','t3o',function(v){return PE.fmt(v,2);},function(v){t=v;st.redraw();});
+  document.querySelectorAll('#sign3 .btn').forEach(function(b){b.addEventListener('click',function(){sg=parseInt(b.getAttribute('data-s'),10);document.querySelectorAll('#sign3 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});st.redraw();});});
+})();
+</script>
+</body>
+</html>

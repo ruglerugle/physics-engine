@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>チート900を数式で動かす ― 3Dの体を動かす数学と物理を学ぶ全9ステージの無料学習ゲーム</title>
+<meta name="description" content="空中で2回転半する蹴り技「チート900」の3Dアニメーションは、数の表と数式だけで動いている。ベクトル・内積と外積・回転行列・四元数・2関節IK・重心・角運動量・フィルタ・カメラの投影まで、実際に使った計算を全9ステージで中学生にもわかるように解説。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="チート900を数式で動かす ― 3Dの体を動かす数学と物理を学ぶ全9ステージの無料学習ゲーム">
+<meta property="og:description" content="空中で2回転半する蹴り技の3Dアニメーションを、ベクトル・行列・四元数・角運動量で動かす。実際に使った計算を全9ステージで。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LearningResource",
+  "name": "チート900を数式で動かす",
+  "alternateName": "PHYSICS ENGINE QUEST",
+  "description": "蹴り技チート900の3Dアニメーションを題材に、3Dの体を動かす数学と物理（ベクトル・内積と外積・回転行列・四元数・2関節IK・重心と放物線・角運動量と慣性テンソル・時間方向のフィルタ・カメラの投影と最小二乗）を学ぶ全9ステージの無料学習ゲーム。",
+  "url": "https://physics-engine.habatakijuku.com/",
+  "inLanguage": "ja",
+  "learningResourceType": "learning activity",
+  "educationalLevel": "中学生以上",
+  "teaches": "座標とベクトル・速さと加速度・内積と外積・回転行列・四元数と球面補間・2関節IKと余弦定理・重心と放物線・角運動量と慣性テンソル・ガウスフィルタ・透視投影と最小二乗",
+  "isAccessibleForFree": true,
+  "author": { "@type": "Person", "name": "ruglerugle" },
+  "hasPart": [
+    { "@type": "LearningResource", "position": 1, "name": "STAGE1 動きは数の表", "url": "https://physics-engine.habatakijuku.com/stage1" },
+    { "@type": "LearningResource", "position": 2, "name": "STAGE2 長さと角度を測る", "url": "https://physics-engine.habatakijuku.com/stage2" },
+    { "@type": "LearningResource", "position": 3, "name": "STAGE3 回転を表す", "url": "https://physics-engine.habatakijuku.com/stage3" },
+    { "@type": "LearningResource", "position": 4, "name": "STAGE4 向きをなめらかにつなぐ", "url": "https://physics-engine.habatakijuku.com/stage4" },
+    { "@type": "LearningResource", "position": 5, "name": "STAGE5 膝の置き場所", "url": "https://physics-engine.habatakijuku.com/stage5" },
+    { "@type": "LearningResource", "position": 6, "name": "STAGE6 空中の重心", "url": "https://physics-engine.habatakijuku.com/stage6" },
+    { "@type": "LearningResource", "position": 7, "name": "STAGE7 縮めると速く回る", "url": "https://physics-engine.habatakijuku.com/stage7" },
+    { "@type": "LearningResource", "position": 8, "name": "STAGE8 ならすと何が変わる", "url": "https://physics-engine.habatakijuku.com/stage8" },
+    { "@type": "LearningResource", "position": 9, "name": "STAGE9 動画に重ねる", "url": "https://physics-engine.habatakijuku.com/stage9" }
+  ]
+}
+</script>
+<style>
+  .hero-body{width:min(100%,320px);height:auto;display:block;margin:0 auto 6px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));border-radius:14px}
+  .quest-card.soon{opacity:.62;pointer-events:none}
+  .quest-card.soon .q-cta{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="topbar" aria-label="サイト情報">
+    <span class="brand-badge" aria-hidden="true">🥋</span>
+    <span class="brand-copy">
+      <strong>チート900を数式で動かす</strong>
+      <small>PHYSICS ENGINE QUEST</small>
+    </span>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <canvas class="hero-body" id="hero-cv" width="320" height="300" aria-hidden="true"></canvas>
+      <h1><span class="line">空中で2回転半の蹴りを、</span><span class="line accent">数の表と式で動かす。</span></h1>
+      <p>画面の中で跳んで、回って、蹴る棒人間。その動きは、<span class="nowrap">1秒に60枚の「数の表」</span>でできている。<span class="nowrap">点を回すのは行列と四元数、</span><span class="nowrap">膝の位置を決めるのは余弦定理、</span><span class="nowrap">空中で回る速さを決めるのは角運動量。</span>このアニメーションを作るときに実際に使った計算を、1つずつ自分の手で確かめよう。</p>
+    </div>
+  </header>
+  <main>
+    <section class="board" aria-labelledby="quest-heading">
+      <div class="board-head">
+        <div><h2 id="quest-heading">クエストを選ぼう！</h2></div>
+        <p>ステージ1から順番にクリアしよう（前のステージをクリアすると次が解放されます）。出発点は中学の数学（座標・三平方の定理）。cos と sin は『本当はおもしろい複素数の世界』や『ロータリーエンジンを作図する』で学んだものを使います。</p>
+      </div>
+      <div class="quest-grid">
+        <a class="quest-card" href="stage1.html" data-stage="1" style="--accent:#2f7a55;--accent-bg:#e4f3ea">
+          <div class="q-top"><span class="q-num">1</span><span class="q-suit" aria-hidden="true">🎞️</span></div>
+          <div class="q-meta"><span class="q-tag">座標・ベクトル</span><span class="q-time">⏱ 約12分</span></div>
+          <div class="q-title">動きは数の表</div>
+          <p class="q-desc">アニメーションの正体は、24個の点の (x, y, z) を1秒に60回並べた表。コマとコマの差から速さを、速さの差から加速度を出し、空中では重力の 9.8 m/s² が見えることを確かめる。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage2.html" data-stage="2" style="--accent:#b5504a;--accent-bg:#fdefed">
+          <div class="q-top"><span class="q-num">2</span><span class="q-suit" aria-hidden="true">📐</span></div>
+          <div class="q-meta"><span class="q-tag">内積と外積</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">長さと角度を測る</div>
+          <p class="q-desc">骨の長さ、膝の曲がる角度（内積）、膝がどちら向きに曲がるか（外積）。2本の矢印から、長さ・角度・向きを取り出す。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage3.html" data-stage="3" style="--accent:#9a6a1c;--accent-bg:#fbf2df">
+          <div class="q-top"><span class="q-num">3</span><span class="q-suit" aria-hidden="true">🔄</span></div>
+          <div class="q-meta"><span class="q-tag">回転行列</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">回転を表す</div>
+          <p class="q-desc">点を回す計算を「行列」という数の箱にまとめる。軸と角度から回転を作るロドリゲスの公式と、骨盤に乗って見る座標系。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage4.html" data-stage="4" style="--accent:#3f5fa6;--accent-bg:#e9eef9">
+          <div class="q-top"><span class="q-num">4</span><span class="q-suit" aria-hidden="true">🌐</span></div>
+          <div class="q-meta"><span class="q-tag">四元数</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">向きをなめらかにつなぐ</div>
+          <p class="q-desc">向きの「平均」や「途中」を作るには、行列より四元数が向いている。4つの数で回転を表し、2つの向きの間を球面に沿ってつなぐ。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage5.html" data-stage="5" style="--accent:#2f8f65;--accent-bg:#eaf7ef">
+          <div class="q-top"><span class="q-num">5</span><span class="q-suit" aria-hidden="true">🦵</span></div>
+          <div class="q-meta"><span class="q-tag">2関節IK</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">膝の置き場所</div>
+          <p class="q-desc">足首の位置が決まれば、膝の位置は三角形（余弦定理）で決まる。ただし、脚が伸び切ると膝の向きが決まらなくなる――蹴りの瞬間につま先がジグザグした原因。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage6.html" data-stage="6" style="--accent:#a63f6f;--accent-bg:#fbe9f1">
+          <div class="q-top"><span class="q-num">6</span><span class="q-suit" aria-hidden="true">🎯</span></div>
+          <div class="q-meta"><span class="q-tag">重心と放物線</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">空中の重心</div>
+          <p class="q-desc">体の各部分の重さで平均した点が重心。空中では手足をどう動かしても、重心はボールと同じ放物線を描く。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage7.html" data-stage="7" style="--accent:#7a4fb0;--accent-bg:#f2ecfa">
+          <div class="q-top"><span class="q-num">7</span><span class="q-suit" aria-hidden="true">🌀</span></div>
+          <div class="q-meta"><span class="q-tag">角運動量</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">縮めると速く回る</div>
+          <p class="q-desc">空中では「回転の勢い」が一定。脚を伸ばすと回転は遅く、縮めると速くなる。回りにくさを表す行列（慣性テンソル）で、それを計算する。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage8.html" data-stage="8" style="--accent:#7a6a2f;--accent-bg:#f7f3e2">
+          <div class="q-top"><span class="q-num">8</span><span class="q-suit" aria-hidden="true">〰️</span></div>
+          <div class="q-meta"><span class="q-tag">フィルタ</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">ならすと何が変わる</div>
+          <p class="q-desc">細かい揺れを時間方向にならす。でも「位置」をならすか「向き」をならすかで、膝の曲がり方まで変わってしまう。軌跡の波打ちを消した方法。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+        <a class="quest-card" href="stage9.html" data-stage="9" style="--accent:#8a4a2a;--accent-bg:#f8ece4">
+          <div class="q-top"><span class="q-num">9</span><span class="q-suit" aria-hidden="true">🎥</span></div>
+          <div class="q-meta"><span class="q-tag">投影と最小二乗</span><span class="q-time">⏱ 約15分</span></div>
+          <div class="q-title">動画に重ねる</div>
+          <p class="q-desc">3D の点をカメラの画面に写す式と、ずれの二乗の合計を小さくする最小二乗。カメラ1台では奥行きが決まらない、という落とし穴まで。</p>
+          <span class="q-cta">はじめる →</span>
+        </a>
+      </div>
+    </section>
+    <section class="board" aria-labelledby="src-heading" style="margin-top:16px">
+      <div class="board-head">
+        <div><h2 id="src-heading">この動きの元のページ</h2></div>
+        <p>題材のアニメーションは、大阪のアクロバット教室 ACST-BJ の技解説ページで、360°回して見られます</p>
+      </div>
+      <div class="quest-grid">
+        <a class="quest-card" href="https://acst-bj.com/tricks/cheat-900-kick/" target="_blank" rel="noopener" style="--accent:#24406e;--accent-bg:#e7edf7">
+          <div class="q-top"><span class="q-num">🥋</span><span class="q-suit" aria-hidden="true">🌀</span></div>
+          <div class="q-meta"><span class="q-tag">トリッキング</span><span class="q-time">3D図解</span></div>
+          <div class="q-title">チート900のやり方とコツ</div>
+          <p class="q-desc">チートステップから地面で約520°回って跳び、空中で約1周してから回し蹴りを当てる技。このサイトで扱う動きの完成形。</p>
+          <span class="q-cta">見る →</span>
+        </a>
+      </div>
+    </section>
+    <section class="board" aria-labelledby="next-heading" style="margin-top:16px">
+      <div class="board-head">
+        <div><h2 id="next-heading">バックナンバー</h2></div>
+        <p>同じねこ博士とうさ美が案内する、姉妹サイトの学習クエスト</p>
+      </div>
+      <div class="quest-grid">
+        <a class="quest-card" href="https://rotary-engine.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#3d5f88;--accent-bg:#e6eef7">
+          <div class="q-top"><span class="q-num">⚙</span><span class="q-suit" aria-hidden="true">🍙</span></div>
+          <div class="q-meta"><span class="q-tag">作図</span><span class="q-time">全8ステージ</span></div>
+          <div class="q-title">ロータリーエンジンを作図する</div>
+          <p class="q-desc">繭形のハウジングと三角おむすびのローターを、座標と cos・sin だけで描く。このサイトで使う「点を式で作る」の練習にもなる。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+        <a class="quest-card" href="https://complex-number.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#5b3fa6;--accent-bg:#efe9f9">
+          <div class="q-top"><span class="q-num">i</span><span class="q-suit" aria-hidden="true">🌀</span></div>
+          <div class="q-meta"><span class="q-tag">複素数</span><span class="q-time">全8ステージ</span></div>
+          <div class="q-title">本当はおもしろい複素数の世界</div>
+          <p class="q-desc">cos と sin の出どころと、「掛け算は回転」という見方。このサイトの四元数は、複素数を3D の回転へ広げたもの。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+        <a class="quest-card" href="https://quantum-mechanics.habatakijuku.com/" target="_blank" rel="noopener" style="--accent:#1f7488;--accent-bg:#e4f2f5">
+          <div class="q-top"><span class="q-num">⚛</span><span class="q-suit" aria-hidden="true">🌌</span></div>
+          <div class="q-meta"><span class="q-tag">量子力学</span><span class="q-time">全9クエスト</span></div>
+          <div class="q-title">量子力学、冒険の書</div>
+          <p class="q-desc">二重スリットから量子コンピュータの回路作りまで、9つのクエストでたどる量子力学のシリーズマップ。</p>
+          <span class="q-cta">読む →</span>
+        </a>
+      </div>
+    </section>
+    <div id="book-recommend"></div>
+  </main>
+  <footer>
+    <p>NO DOWNLOAD. NO REGISTRATION. JUST LEARN. &nbsp;© <span id="year"></span> ruglerugle</p>
+    <div class="footer-suits" aria-hidden="true"><span>🎞️</span><span>📐</span><span>🔄</span><span>🌀</span></div>
+  </footer>
+</div>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initCoverPage();</script>
+<script>
+/* ヒーロー：チート900の棒人間をくり返し再生（つま先の軌跡つき） */
+(function(){
+  var cv=document.getElementById('hero-cv'); if(!cv||!window.PE) return;
+  var ctx=cv.getContext('2d'), dpr=Math.min(window.devicePixelRatio||1,2), W=320, H=300;
+  cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  var st={cv:cv,ctx:ctx,W:W,H:H}, cam=PE.camera(st,{yaw:62,pitch:12,dist:5.2,target:[0,0.95,0.15],drag:false,scale:0.95});
+  var t=0, T=PE.N/PE.fps+0.6;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#fdfbf6'); g.addColorStop(1,'#eef3ee'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    var k=Math.min(PE.N-1,Math.floor(t*PE.fps)), c=PE.com(k); cam.target=[c[0],0.95,0.15];  // カメラは重心について行く
+    PE.floor(ctx,cam,-1.5,3.5,-1.5,1.5,0.5);
+    ctx.strokeStyle='#e0a94a'; ctx.lineWidth=2; ctx.beginPath();
+    for(var i=Math.round(PE.M.events.takeoff*PE.fps);i<=k;i++){var q=cam.proj(PE.P(i,'toeR')); if(i===Math.round(PE.M.events.takeoff*PE.fps))ctx.moveTo(q.x,q.y); else ctx.lineTo(q.x,q.y);}
+    if(k>Math.round(PE.M.events.takeoff*PE.fps)) ctx.stroke();
+    PE.drawBody(ctx,cam,PE.pose(k));
+  }
+  draw();
+  if(!PE.reducedMotion()){
+    var last=0; (function loop(now){ var dt=last?Math.min((now-last)/1000,0.05):0; last=now; t=(t+dt*0.8)%T; draw(); requestAnimationFrame(loop); })(0);
+  }
+})();
+</script>
+</body>
+</html>

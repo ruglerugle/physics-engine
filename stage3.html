@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE3 回転を表す（回転行列と座標系） ― チート900を数式で動かす</title>
+<meta name="description" content="点を回す計算を「回転行列」という数の箱にまとめる。軸の矢印が回った先を並べると行列になる理由、骨盤に乗って見る座標系（内積で読む）、好きな軸のまわりに回すロドリゲスの公式、回す順番で結果が変わることを、チート900の体で確かめる。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage3">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE3 回転を表す（回転行列と座標系） ― チート900を数式で動かす">
+<meta property="og:description" content="点を回す計算を行列にまとめ、骨盤に乗って見る座標系と、好きな軸のまわりに回すロドリゲスの公式を、チート900の体で確かめる。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage3">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE3 回転を表す",
+      "description": "点を回す計算を「回転行列」という数の箱にまとめる。軸の矢印が回った先を並べると行列になる理由、骨盤に乗って見る座標系（内積で読む）、好きな軸のまわりに回すロドリゲスの公式、回す順番で結果が変わることを、チート900の体で確かめる。",
+      "url": "https://physics-engine.habatakijuku.com/stage3",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 3,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE3 回転を表す",
+          "item": "https://physics-engine.habatakijuku.com/stage3"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 3 ― 回転を表す ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 3</span><h1 class="chapter-title">回転を表す</h1>
+        <div class="chapter-sub">回転行列と座標系</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">点を回す計算を<strong>回転行列</strong>にまとめ、行列の列が「軸の矢印が回った先」であることを説明しよう。骨盤に乗って見た座標を<strong>内積</strong>で読み、好きな軸のまわりに回す<strong>ロドリゲスの公式</strong>を、ベクトルを分けて組み立てられれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">チート900は、地面と空中を合わせて900°回る技だ。体全体を回したり、骨盤の向きを調べたり、脚だけを少し回したり――このアニメーションを作るときは「点を回す」計算を数えきれないほど使った。今日はその計算を整理する。まずは平面で、原点のまわりに点 (x, y) を角度 φ（ファイ）だけ反時計回りに回すと、どこへ行くかを考えよう。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">『本当はおもしろい複素数の世界』で、点 (x, y) を複素数 x＋yi と見て、cos φ＋i sin φ を掛けると φ だけ回る、と習いました。(x＋yi)(cos φ＋i sin φ) を展開すると、i²＝−1 なので、(x cos φ − y sin φ) ＋ (x sin φ ＋ y cos φ) i。回した点は <strong>(x cos φ − y sin φ, x sin φ ＋ y cos φ)</strong> です。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">よく覚えていたね。同じ式を、3次元にも広げられる別の見方で出し直そう。x の向きの長さ1の矢印 e<sub>x</sub>＝(1, 0) と、y の向きの e<sub>y</sub>＝(0, 1) を用意する。どんな点も、(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub>、つまり「e<sub>x</sub> の向きに x 歩、e<sub>y</sub> の向きに y 歩」と書ける。図形を丸ごと回すと、この「歩き方」はそのままで、2本の矢印だけが回る。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">e<sub>x</sub> は φ 回ると (cos φ, sin φ)。e<sub>y</sub> は、もともと e<sub>x</sub> から 90° 先にあるので、φ 回ると角度 φ＋90° の向きで、(cos(φ＋90°), sin(φ＋90°)) ＝ (−sin φ, cos φ) です。x 倍と y 倍して足すと (x cos φ − y sin φ, x sin φ ＋ y cos φ)。複素数の掛け算と同じ答えになりました。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">この計算を短く書くために、回った矢印を<strong>縦に並べて箱にする</strong>。左の列が回った e<sub>x</sub>、右の列が回った e<sub>y</sub> だ。この数の箱を<strong>行列</strong>といい、回転を表すものを<strong>回転行列</strong>という。<br><strong>R ＝ ( cos φ −sin φ ／ sin φ cos φ )</strong>（「／」で上の行と下の行を区切った）<br>行列とベクトルの掛け算 R(x, y) は、「行列の各行と (x, y) の内積を、上から並べたもの」と決める。上の行 (cos φ, −sin φ) と (x, y) の内積が x cos φ − y sin φ、下の行との内積が x sin φ ＋ y cos φ。さっきの答えそのものだ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv1" role="img" aria-label="平面の回転。x と y の向きの矢印が角度φ回り、その2本を列に並べたものが回転行列。棒人間の横から見た形も一緒に回る"></canvas></div>
+        <div class="sim-controls">
+          <label>回す角度 φ <input type="range" id="ph1" min="-180" max="180" value="35" step="1"> <output id="ph1o"></output></label>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">赤の矢印が回った e<sub>x</sub>＝(cos φ, sin φ)、緑の矢印が回った e<sub>y</sub>＝(−sin φ, cos φ)。この2本を列に並べたものが回転行列 R。灰色の棒人間（横から見たチート900の構え）の点は、どれも「x×赤＋y×緑」の位置へ移る</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">行列の列を見るだけで、軸の矢印がどこへ回ったかが分かるんですね。3次元でも同じですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">同じだ。3次元では軸の矢印が3本 e<sub>x</sub>、e<sub>y</sub>、e<sub>z</sub> あるから、回った3本を列に並べた 3×3 の箱が回転行列になる。たとえば上向きの y 軸のまわりに φ 回すと――体が床の上でくるっと回る向きだね――y の矢印は動かず、x と z の矢印が床に平行な面の中で回る。<br><strong>R<sub>y</sub> ＝ ( cos φ 0 sin φ ／ 0 1 0 ／ −sin φ 0 cos φ )</strong><br>真ん中の列 (0, 1, 0) が「y の矢印は動かない」を表している。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">逆に、回転行列が分からなくても、回った後の3本の矢印さえ分かれば、それを並べれば回転行列になる、ということですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。そして、それがとても役に立つ。チート900の骨盤を考えよう。左の股関節から右の股関節へ向かう<strong>右向き</strong>の矢印 d、骨盤の<strong>上向き</strong>の矢印 u、そして2本に直角な<strong>前向き</strong>の矢印 f ＝ u×d（外積だ。順番を逆にした d×u だと、右手の規則で後ろ向きになる）。どれも長さを1にそろえ、お互いに直角になるようにしておく。この3本を並べた行列が、<strong>骨盤がどれだけ回っているか</strong>を表す回転行列になる。このように、体のある部分にくっついた3本の直角な矢印の組を<strong>座標系</strong>という。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">骨盤の座標系があると、何が分かるんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">「<strong>骨盤に乗って見ると</strong>、つま先はどこにあるか」が分かる。骨盤の中心 c からつま先 q への矢印を q−c とすると、骨盤から見た座標は (d・(q−c), u・(q−c), f・(q−c))。ステージ2で話した、<strong>内積は、長さ1の矢印の向きへの影の長さ</strong>という性質を使っているんだ。下の図で、体が空中で回っても、骨盤から見た座標はあまり変わらないことを確かめてごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="チート900の骨盤に付けた3本の矢印（右・上・前）と、右つま先の座標を、床の座標と骨盤から見た座標の両方で表示"></canvas></div>
+        <div class="sim-controls">
+          <label>コマ <input type="range" id="k2" min="0" max="161" value="70" step="1"> <output id="k2o"></output></label>
+          <button class="sim-play" id="play2" type="button" aria-pressed="false">▶ 再生</button>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">骨盤の中心から出る3本の矢印が骨盤の座標系（赤＝右 d、緑＝上 u、青＝前 f）。右つま先の位置を「床の座標」と「骨盤から見た座標（d・u・f との内積）」で並べた。再生すると、床の座標は体の回転につれて大きく変わるが、骨盤から見た座標は脚の動きの分しか変わらない</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">床の座標だと、空中で体が回るたびにつま先の x と z が大きく入れ替わるのに、骨盤から見た座標はゆっくりしか変わりません。脚の形そのものを見ているからですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。だから「脚の形」を扱いたいときは骨盤の座標系で考える。実際、このアニメーションでは、インパクトの前後で蹴り脚の形が崩れたとき、<strong>前の版の蹴り脚の形を骨盤から見た座標で取り出し、今の骨盤の向きに付け直す</strong>ことで直した。骨盤から見た座標から床の座標に戻すときは、c ＋（d、u、f をそれぞれの成分倍して足したもの）、つまり回転行列を掛けて c を足せばいい。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">もう1つ知りたいです。体全体を、ななめの軸のまわりに少しだけ回したいときはどうするんですか？ x・y・z の軸のまわりではなくて。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">いい質問だね。軸の向きを長さ1の矢印 k、回す角度を θ として、点（ベクトル）v を回すことを考えよう。コツは、v を<strong>軸に平行な部分</strong>と<strong>軸に直角な部分</strong>に分けることだ。軸に平行な部分は、軸への影だから内積で (k・v) k。直角な部分は、v からそれを引いた v<sub>⊥</sub> ＝ v − (k・v) k。軸のまわりに回すと、それぞれどうなると思う？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">軸に平行な部分は、軸の上にあるので、回しても動きません。直角な部分は、軸のまわりの円の上を回ります。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。直角な部分 v<sub>⊥</sub> が回る円の平面には、v<sub>⊥</sub> 自身と、それに直角でちょうど90° 先にある矢印 k×v が乗っている。k×v は外積だから k にも v<sub>⊥</sub> にも直角で、長さは |k| |v<sub>⊥</sub>| ＝ |v<sub>⊥</sub>|、ちょうど同じ長さだ。だから平面の回転と同じように、θ 回った後は <strong>v<sub>⊥</sub> cos θ ＋ (k×v) sin θ</strong>。これに動かない平行な部分を足すと、<br><strong>回した v ＝ v cos θ ＋ (k×v) sin θ ＋ k (k・v)(1−cos θ)</strong><br>これを<strong>ロドリゲスの回転公式</strong>という。最後の項は、v<sub>⊥</sub> cos θ を v cos θ と (k・v)k cos θ に分けて、平行な部分とまとめたものだ。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="ロドリゲスの回転公式。軸の向きと回す角度を決めると、チート900の体が重心のまわりに回る。右つま先について、軸に平行な部分と、軸のまわりの円を表示"></canvas></div>
+        <div class="sim-controls">
+          <label>軸の向き（横） <input type="range" id="ay3" min="-180" max="180" value="30" step="1"> <output id="ay3o"></output></label>
+          <label>軸の傾き <input type="range" id="ap3" min="-90" max="90" value="60" step="1"> <output id="ap3o"></output></label>
+        </div>
+        <div class="sim-controls">
+          <label>回す角度 θ <input type="range" id="th3" min="0" max="360" value="0" step="1"> <output id="th3o"></output></label>
+        </div>
+        <div class="sim-controls">
+          <button class="btn" type="button" id="ord1">x 軸→y 軸の順に 90° ずつ</button>
+          <button class="btn" type="button" id="ord2">y 軸→x 軸の順に 90° ずつ</button>
+          <button class="btn" type="button" id="ord0">元に戻す</button>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">紫の線が回転の軸（重心を通り、向きは長さ1の矢印 k）。オレンジの円が、右つま先の「軸に直角な部分」が回る道すじ。下のボタンは、同じ 90° ずつの回転でも、回す順番を入れ替えると最後の向きが違うことを見るためのもの。図はドラッグで回せる</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">下のボタンで、x 軸と y 軸のまわりに 90° ずつ回す順番を入れ替えたら、最後の姿勢がまったく違いました。平面の回転は、30° 回してから 40° 回しても、40° 回してから 30° 回しても同じなのに。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">3次元の回転の大事な性質だ。<strong>回す順番を入れ替えると結果が変わる</strong>。行列でいうと、「回転行列の掛け算は、順番を入れ替えると答えが変わる」ということになる。体全体の向きを少しずつ直す計算を重ねるときには、どの順番で掛けるかに気をつけないといけない。それから、3つの軸のまわりの角度（たとえば左右・上下・ひねり）で向きを表す方法もあるけれど、順番の問題と、ある向きのときに角度が1つに決まらなくなる問題があって、なめらかにつなぐのには向いていない。次のステージでは、それを解決する<strong>四元数</strong>を扱う。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">平面で φ 回す：<span class="nw">(x, y) → (x cos φ − y sin φ, x sin φ ＋ y cos φ)</span>（複素数の掛け算と同じ）</span>
+        <span class="step">回転行列＝軸の矢印が回った先を、列に並べた箱。行列×ベクトル＝各行との内積を並べたもの</span>
+        <span class="step">座標系＝体の部分にくっついた、長さ1で互いに直角な3本の矢印（骨盤なら右 d・上 u・前 f＝u×d）。骨盤から見た座標は <span class="nw">(d・(q−c), u・(q−c), f・(q−c))</span></span>
+        <span class="step">ロドリゲスの回転公式（軸 k、角度 θ）：<span class="nw">v cos θ ＋ (k×v) sin θ ＋ k (k・v)(1−cos θ)</span>。軸に平行な部分は動かず、直角な部分が円の上を回る</span>
+        <span class="step">3次元の回転は、回す順番を入れ替えると結果が変わる</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 平面の点 (1, 0) を、原点のまわりに反時計回りに 90° 回すとどこへ行く？</p>
+        <div class="choice-list">
+          <button class="choice-btn">(−1, 0)</button>
+          <button class="choice-btn">(0, −1)</button>
+          <button class="choice-btn">(0, 1)</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ (x cos φ − y sin φ, x sin φ ＋ y cos φ) に x＝1、y＝0、φ＝90° を入れると (cos 90°, sin 90°) ＝ (0, 1)。右向きの矢印が真上を向く。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 回転行列の「列」は何を表している？</p>
+        <div class="choice-list">
+          <button class="choice-btn">x・y・z の軸の矢印が、回った後に向いている先</button>
+          <button class="choice-btn">回す角度の cos と sin を並べただけで、とくに意味はない</button>
+          <button class="choice-btn">回す前の点の座標</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ どの点も「x×（回った x の矢印）＋ y×（回った y の矢印）＋ z×（回った z の矢印）」へ移るので、回った3本の矢印さえ分かれば回転は決まる。それを列に並べたのが回転行列。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. ロドリゲスの公式で、ベクトル v のうち「回転の軸に平行な部分」は、回すとどうなる？</p>
+        <div class="choice-list">
+          <button class="choice-btn">軸のまわりの円に沿って回る</button>
+          <button class="choice-btn">変わらない</button>
+          <button class="choice-btn">長さが cos θ 倍に縮む</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 軸の上にある部分は、軸のまわりに回しても動かない。円に沿って回るのは、軸に直角な部分 v − (k・v)k だけ。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(3);</script>
+<script>
+/* ---------- 共通：ロドリゲスの回転 ---------- */
+function rodr(v,k,th){ var c=Math.cos(th), s=Math.sin(th), kv=PE.dot(k,v); return PE.add(PE.add(PE.mul(v,c),PE.mul(PE.cross(k,v),s)),PE.mul(k,kv*(1-c))); }
+function rotPose(p,center,k,th){ var o={}; for(var n in p) o[n]=PE.add(center,rodr(PE.sub(p[n],center),k,th)); return o; }
+
+/* ---------- シミュレータ1：平面の回転行列 ---------- */
+(function(){
+  var ph=35, st, k0=20, pose=PE.pose(k0), c0=PE.com(k0);
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W,H)/3.2, O={x:W*0.5,y:H*0.55}, f=PE.rad(ph), c=Math.cos(f), si=Math.sin(f);
+    var P=function(x,y){return {x:O.x+x*s,y:O.y-y*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1;
+    for(var i=-4;i<=4;i++){var a=P(i/2,-2),b=P(i/2,2);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();a=P(-2,i/2);b=P(2,i/2);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    // 横から見た棒人間（x＝進行方向、y＝上）を、重心が原点に来るようにして回す
+    function rp(q){var x=q[0]-c0[0], y=q[1]-c0[1]; return P(x*c-y*si, x*si+y*c);}
+    function rp0(q){return P(q[0]-c0[0], q[1]-c0[1]);}
+    ctx.lineCap='round';
+    [rp0,rp].forEach(function(F,j){
+      ctx.globalAlpha=j?1:0.18;
+      PE.BONES.forEach(function(b){var A=F(pose[b[0]]),B=F(pose[b[1]]);ctx.strokeStyle=PE.C[b[2]];ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();});
+      var hm=PE.mid(pose.hipR,pose.hipL), sm=PE.mid(pose.shR,pose.shL), em=PE.mid(pose.earR,pose.earL);
+      [[hm,sm],[sm,em]].forEach(function(e){var A=F(e[0]),B=F(e[1]);ctx.strokeStyle=PE.C.spine;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();});
+      var E=F(em); ctx.fillStyle=PE.C.paper; ctx.strokeStyle=PE.C.head; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(E.x,E.y,0.11*s,0,PE.TAU); ctx.fill(); ctx.stroke();
+    });
+    ctx.globalAlpha=1; ctx.lineCap='butt';
+    var ex=P(c,si), ey=P(-si,c);
+    PE.arrowPx(ctx,O.x,O.y,ex.x,ex.y,PE.C.x,3.5,11); PE.arrowPx(ctx,O.x,O.y,ey.x,ey.y,PE.C.y,3.5,11);
+    PE.text(ctx,ex.x+12*c,ex.y-12*si,'回った eₓ',PE.C.x,12,900); PE.text(ctx,ey.x-12*si,ey.y-12*c,'回った eᵧ',PE.C.y,12,900);
+    ctx.strokeStyle=PE.C.gold; ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(O.x,O.y,24,0,-f,f>0); ctx.stroke();
+    PE.text(ctx,10,16,'横から見た構え（x＝進行方向、y＝上）',PE.C.muted,11.5,800,'left');
+    document.getElementById('ro1').innerHTML='<span>R ＝ ( <b>'+PE.fmt(c,3)+'</b>　<b>'+PE.fmt(-si,3)+'</b> ／ <b>'+PE.fmt(si,3)+'</b>　<b>'+PE.fmt(c,3)+'</b> )</span><span>左の列＝回った eₓ、右の列＝回った eᵧ</span>';
+  }
+  st=PE.canvas('cv1',0.7,draw);
+  PE.bindRange('ph1','ph1o',function(v){return v+'°';},function(v){ph=v;st.redraw();});
+})();
+
+/* ---------- シミュレータ2：骨盤の座標系 ---------- */
+(function(){
+  var k=70, st, cam;
+  function frame(p){ var c=PE.mid(p.hipR,p.hipL), d=PE.norm(PE.sub(p.hipR,p.hipL)), u0=PE.sub(p.pelvisTop,c), u=PE.norm(PE.sub(u0,PE.mul(d,PE.dot(u0,d)))), f=PE.cross(u,d); return {c:c,d:d,u:u,f:f}; }
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var p=PE.pose(k), F=frame(p), q=p.toeR; cam.target=[F.c[0],Math.max(0.8,F.c[1]),F.c[2]];
+    PE.floor(ctx,cam,F.c[0]-2,F.c[0]+2,-1.5,1.5,0.5);
+    PE.drawBody(ctx,cam,p,{alpha:0.55,highlight:'toeR'});
+    var C=cam.proj(F.c);
+    [[F.d,PE.C.x,'d（右）'],[F.u,PE.C.y,'u（上）'],[F.f,PE.C.z,'f（前）']].forEach(function(a){var T=cam.proj(PE.add(F.c,PE.mul(a[0],0.45)));PE.arrowPx(ctx,C.x,C.y,T.x,T.y,a[1],3.5,10);PE.text(ctx,T.x+6,T.y-8,a[2],a[1],12,900,'left');});
+    var Q=cam.proj(q); ctx.strokeStyle=PE.C.gold; ctx.setLineDash([4,3]); ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(C.x,C.y); ctx.lineTo(Q.x,Q.y); ctx.stroke(); ctx.setLineDash([]);
+    var r=PE.sub(q,F.c), loc=[PE.dot(F.d,r),PE.dot(F.u,r),PE.dot(F.f,r)];
+    PE.text(ctx,10,16,'t = '+PE.fmt(k/PE.fps,3)+' 秒（コマ '+k+'）',PE.C.ink,12,900,'left');
+    document.getElementById('ro2').innerHTML='<span>右つま先・床の座標 (x, y, z) = (<b>'+PE.fmt(q[0],2)+'</b>, <b>'+PE.fmt(q[1],2)+'</b>, <b>'+PE.fmt(q[2],2)+'</b>)</span><span>骨盤から見た座標 (d・r, u・r, f・r) = (<b>'+PE.fmt(loc[0],2)+'</b>, <b>'+PE.fmt(loc[1],2)+'</b>, <b>'+PE.fmt(loc[2],2)+'</b>)</span>';
+  }
+  st=PE.canvas('cv2',0.72,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:65,pitch:20,dist:4.2,target:[0.8,0.9,0],scale:0.95});
+  var el=PE.bindRange('k2','k2o',function(v){return PE.fmt(v/PE.fps,2)+' 秒';},function(v){k=v;st.redraw();});
+  var ft=k; PE.player(document.getElementById('play2'),function(dt){ft=(ft+dt*PE.fps*0.35)%PE.N; el.set(Math.floor(ft));});
+  el.addEventListener('input',function(){ft=parseFloat(el.value);});
+  st.redraw();
+})();
+
+/* ---------- シミュレータ3：ロドリゲスの公式と回す順番 ---------- */
+(function(){
+  var ay=30, ap=60, th=0, k0=78, base=PE.pose(k0), cen=PE.com(k0), order=null, st, cam;
+  function axis(){ var a=PE.rad(ay), b=PE.rad(ap); return [Math.cos(b)*Math.cos(a), Math.sin(b), Math.cos(b)*Math.sin(a)]; }
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    cam.target=cen;
+    var p, k=axis();
+    if(order){ var X=[1,0,0], Y=[0,1,0], a1=order==='xy'?X:Y, a2=order==='xy'?Y:X; p=rotPose(rotPose(base,cen,a1,Math.PI/2),cen,a2,Math.PI/2); }
+    else p=rotPose(base,cen,k,PE.rad(th));
+    PE.drawBody(ctx,cam,base,{alpha:0.15,thin:true});
+    if(!order){
+      var A=cam.proj(PE.add(cen,PE.mul(k,-1.1))), B=cam.proj(PE.add(cen,PE.mul(k,1.1)));
+      PE.arrowPx(ctx,A.x,A.y,B.x,B.y,PE.C.armL,2.5,11); PE.text(ctx,B.x+8,B.y-6,'軸 k',PE.C.armL,12.5,900,'left');
+      var v=PE.sub(base.toeR,cen), par=PE.mul(k,PE.dot(k,v)), perp=PE.sub(v,par), w=PE.cross(k,v);
+      ctx.strokeStyle='#e0a94a'; ctx.lineWidth=1.8; ctx.setLineDash([5,4]); ctx.beginPath();
+      for(var i=0;i<=64;i++){var a=i/64*PE.TAU, q=cam.proj(PE.add(cen,PE.add(par,PE.add(PE.mul(perp,Math.cos(a)),PE.mul(w,Math.sin(a)))))); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);} ctx.stroke(); ctx.setLineDash([]);
+      var Pc=cam.proj(PE.add(cen,par)), Cc=cam.proj(cen); ctx.strokeStyle=PE.C.armL; ctx.lineWidth=4; ctx.globalAlpha=0.6; ctx.beginPath(); ctx.moveTo(Cc.x,Cc.y); ctx.lineTo(Pc.x,Pc.y); ctx.stroke(); ctx.globalAlpha=1;
+      PE.text(ctx,Pc.x+8,Pc.y+10,'(k・v)k',PE.C.armL,11.5,900,'left');
+    }
+    PE.drawBody(ctx,cam,p,{highlight:'toeR'});
+    PE.text(ctx,10,16,order?(order==='xy'?'x 軸のまわりに 90° → y 軸のまわりに 90°':'y 軸のまわりに 90° → x 軸のまわりに 90°'):'重心のまわりに、軸 k で θ 回す（インパクトの姿勢）',PE.C.ink,12,900,'left');
+    document.getElementById('ro3').innerHTML=order?'<span>同じ2つの回転でも、順番が違うと最後の姿勢が違う</span>':'<span>k = (<b>'+PE.fmt(k[0],2)+'</b>, <b>'+PE.fmt(k[1],2)+'</b>, <b>'+PE.fmt(k[2],2)+'</b>)（長さ <b>'+PE.fmt(PE.len(k),2)+'</b>）</span><span>θ = <b>'+th+'°</b></span>';
+  }
+  st=PE.canvas('cv3',0.75,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:65,pitch:18,dist:5.4,target:cen,scale:0.95});
+  function set(fn){return function(v){fn(v);order=null;st.redraw();};}
+  PE.bindRange('ay3','ay3o',function(v){return v+'°';},set(function(v){ay=v;}));
+  PE.bindRange('ap3','ap3o',function(v){return v+'°';},set(function(v){ap=v;}));
+  PE.bindRange('th3','th3o',function(v){return v+'°';},set(function(v){th=v;}));
+  document.getElementById('ord1').addEventListener('click',function(){order='xy';st.redraw();});
+  document.getElementById('ord2').addEventListener('click',function(){order='yx';st.redraw();});
+  document.getElementById('ord0').addEventListener('click',function(){order=null;st.redraw();});
+  st.redraw();
+})();
+</script>
+</body>
+</html>

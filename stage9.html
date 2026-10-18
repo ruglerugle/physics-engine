@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16291f">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9RTQCP2HXM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9RTQCP2HXM');
+</script>
+<title>STAGE9 動画に重ねる（投影と最小二乗） ― チート900を数式で動かす</title>
+<meta name="description" content="3Dの体を動画の画面に写す「投影」は、カメラの向きの3本のベクトルとの内積と、奥行きで割る計算。写すと奥行きが消えるので、動画1本からは奥行きが決まらない。誤差の2乗の合計をいちばん小さくする「最小二乗法」と、重みをつけた条件で、動画に重ねつつ他の向きから見た形を守る方法を学ぶ。">
+<link rel="canonical" href="https://physics-engine.habatakijuku.com/stage9">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="チート900を数式で動かす">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="STAGE9 動画に重ねる（投影と最小二乗） ― チート900を数式で動かす">
+<meta property="og:description" content="3Dを画面に写す投影と、消えてしまう奥行き。誤差の2乗の合計を最小にする最小二乗法と、重みつきの条件で動画に重ねる方法。">
+<meta property="og:url" content="https://physics-engine.habatakijuku.com/stage9">
+<meta property="og:image" content="https://physics-engine.habatakijuku.com/images/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="チート900を数式で動かす：空中で回りながら蹴る棒人間と、角運動量の式 L＝Iω">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LearningResource",
+      "name": "STAGE9 動画に重ねる",
+      "description": "3Dの体を動画の画面に写す「投影」は、カメラの向きの3本のベクトルとの内積と、奥行きで割る計算。写すと奥行きが消えるので、動画1本からは奥行きが決まらない。誤差の2乗の合計をいちばん小さくする「最小二乗法」と、重みをつけた条件で、動画に重ねつつ他の向きから見た形を守る方法を学ぶ。",
+      "url": "https://physics-engine.habatakijuku.com/stage9",
+      "inLanguage": "ja",
+      "learningResourceType": "learning activity",
+      "educationalLevel": "中学生以上",
+      "isAccessibleForFree": true,
+      "position": 9,
+      "isPartOf": {
+        "@type": "LearningResource",
+        "name": "チート900を数式で動かす",
+        "url": "https://physics-engine.habatakijuku.com/"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "ruglerugle"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "チート900を数式で動かす",
+          "item": "https://physics-engine.habatakijuku.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "STAGE9 動画に重ねる",
+          "item": "https://physics-engine.habatakijuku.com/stage9"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="design-system.css?v=20261018a">
+<style>
+  .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+  .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
+  .sim-controls .btn[aria-pressed="true"]{background:linear-gradient(#5fb487,#2f7a55);border-color:#245f42;color:#fff}
+  .sim-controls label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ink)}
+  .sim-controls input[type=range]{width:min(260px,60vw);accent-color:#2f7a55}
+  .sim-controls output{font-variant-numeric:tabular-nums;min-width:4.6em;text-align:right;color:#245f42}
+  .sim-play{padding:6px 16px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--ink);font-size:12px;font-weight:800;cursor:pointer}
+  .sim-play:hover{background:#fff}
+  .cv-wrap{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  .cv-wrap canvas{display:block;width:100%;height:auto;border-radius:8px}
+  .readout{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:8px;font-size:12.5px;font-weight:800;color:#245f42;font-variant-numeric:tabular-nums}
+  .readout span b{color:var(--ink)}
+  .num-table{margin:10px auto 0;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;max-width:100%}
+  .num-table th,.num-table td{border:1px solid var(--line);padding:3px 8px;text-align:right}
+  .num-table th{background:var(--paper2);font-weight:900;color:var(--ink)}
+  .num-table td.nm{text-align:left;font-weight:800;color:var(--muted)}
+  .num-table tr.hl td{background:#fff4d6}
+  .tbl-wrap{overflow-x:auto}
+  .note-box{background:#fffbe8;border:1px solid #e3d48f;border-radius:10px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.75;color:#3a3210;font-weight:700}
+  .note-box .nb-title{display:block;font-weight:950;margin-bottom:4px;color:#7a5a08}
+  .diagram-box svg.box3d{max-width:min(100%,420px)}
+  .box3d .e{stroke:#b9b0a3;stroke-width:1.2;fill:none}
+  .box3d .eh{stroke:#b9b0a3;stroke-width:1.2;stroke-dasharray:4 4;fill:none}
+  .box3d .d1{stroke:#2f7a55;stroke-width:2.4}
+  .box3d .d2{stroke:#c8433f;stroke-width:3}
+  .box3d .lx{fill:#c8433f;font-size:13px;font-weight:900}
+  .box3d .ly{fill:#2f9e5c;font-size:13px;font-weight:900}
+  .box3d .lz{fill:#2f6fb8;font-size:13px;font-weight:900}
+  .box3d .lb{fill:#1b232c;font-size:12.5px;font-weight:900}
+  .box3d .lm{fill:#2f7a55;font-size:12.5px;font-weight:900}
+.cv-two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:560px){.cv-two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app-shell side-collapsed" id="app-shell">
+  <header class="game-header">
+    <div class="brand">
+      <div class="brand-title"><a class="head-reset home-badge" href="index.html" title="トップへ" aria-label="トップへ">🥋</a> <span>チート900を数式で動かす</span></div>
+      <div class="brand-sub">STAGE 9 ― 動画に重ねる ―</div>
+    </div>
+    <div class="head-progress-wrap">
+      <div class="head-progress-label" id="progress-label">クリア 0 / 9</div>
+      <div class="head-progress" role="progressbar" aria-label="クリア済みステージ数" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"><div class="head-progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-actions">
+      <button class="head-reset" id="btn-reset-all">🔄 最初から</button>
+      <button class="head-reset" id="head-nav-toggle" title="ステージ一覧の表示切替">☰ ナビ</button>
+    </div>
+  </header>
+  <div class="game-layout">
+    <div class="side-backdrop" id="side-backdrop"></div>
+    <aside class="side-panel">
+      <div class="side-head">
+        <button class="side-toggle" id="sidebar-toggle" title="ステージ一覧の表示切替" aria-label="ステージ一覧の表示切替">☰</button>
+        <span class="side-head-text">📚 ステージ一覧</span>
+      </div>
+      <div class="side-list" id="side-list"></div>
+    </aside>
+    <main class="main-area">
+      <div class="chapter-head">
+        <span class="chapter-badge">STAGE 9</span><h1 class="chapter-title">動画に重ねる</h1>
+        <div class="chapter-sub">投影と最小二乗</div>
+      </div>
+      <div class="mission-box">
+        <div class="mission-label">🎯 ミッション</div>
+        <div class="mission-text">3Dの点を画面に写す<strong>投影</strong>の式を説明し、写すと<strong>奥行きが消える</strong>ことを確かめよう。誤差の2乗の合計をいちばん小さくする<strong>最小二乗法</strong>で、いくつかの条件に重みをつけてつり合いをとり、動画に重ねながら他の向きから見た形を守る方法がわかれば合格。</div>
+        <span class="mission-status" id="mission-status">未達成</span>
+      </div>
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt=""></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">いよいよ最後のステージだ。チート900のアニメーションは、もとの動画とぴったり重なるように調整した。そのためには、3Dの体を、動画を撮ったカメラから見た画面の上に<strong>写す</strong>計算が要る。これを<strong>投影</strong>という。実は、ステージ1からずっと使ってきた3Dの図も、毎回この計算で画面に写しているんだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">どうやって写すんですか？ 3つの数 (x, y, z) を、画面の2つの数にするんですよね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">カメラには3本の向きがある。画面の右へ向かう向き <strong>r</strong>、上へ向かう向き <strong>u</strong>、カメラが見ている奥への向き <strong>f</strong>。どれも長さ1で、互いに直角だ。カメラの位置を E、写したい点を P として、d ＝ P − E とする。ステージ2の内積を使えば、d がそれぞれの向きにどれだけ進んでいるかがわかる。<br><strong>右へ a ＝ d·r、 上へ b ＝ d·u、 奥へ c ＝ d·f</strong><br>そして、遠い物ほど小さく見えるので、奥行き c で割る。<br><strong>画面の位置 ＝ (焦点距離 × a ÷ c, 焦点距離 × b ÷ c)</strong><br>焦点距離は、カメラのレンズで決まる拡大の倍率だと思えばいい。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">奥行き c で割るということは、カメラから2倍遠い所にある、2倍大きい物は、同じ大きさに写るんですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。それが今日の大問題につながる。点 P をカメラから見たまっすぐな線、つまり<strong>光の通り道</strong>に沿って動かすと、a、b、c が同じ割合で変わるから、a ÷ c と b ÷ c は変わらない。画面の上では<strong>まったく動かない</strong>んだ。下の図で、蹴り脚の膝から下を、それぞれの光の通り道に沿って奥へ動かしてみよう。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-two">
+          <div class="cv-wrap"><canvas id="cv1a" role="img" aria-label="動画のカメラから見た体。蹴り脚を光の通り道に沿って動かしても、この画面では動かない"></canvas></div>
+          <div class="cv-wrap"><canvas id="cv1b" role="img" aria-label="目標側（正面）から見た体。蹴り脚を光の通り道に沿って動かすと、こちらでは形が大きく変わる"></canvas></div>
+        </div>
+        <div class="sim-controls">
+          <label>コマ <input type="range" id="k1" min="0" max="161" value="79" step="1"> <output id="k1o"></output></label>
+          <label>蹴り脚を奥へ <input type="range" id="dp1" min="-0.6" max="0.6" value="0" step="0.01"> <output id="dp1o"></output></label>
+        </div>
+        <div class="readout" id="ro1"></div>
+        <div class="diagram-caption">左＝動画のカメラから見た画面、右＝目標側（正面）から見た図。赤い線が蹴り脚の、もとの位置（薄い色）と動かした位置（濃い色）。点線はカメラからの光の通り道（右の図）。蹴り脚の膝・足首・かかと・つま先を、それぞれの光の通り道に沿って同じ距離だけ動かしている</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">左の画面では脚がまったく動かないのに、右の正面から見た図では、脚が大きく前後にずれます。しかも、太ももの長さまで変わってしまいました。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。<strong>動画1本からは、奥行きが決まらない</strong>んだ。動画の上で重なるだけなら、脚は光の通り道のどこにあってもいい。最初に動画に合わせたとき、正面から見た形が大きく変わってしまったのは、この奥行きをでたらめに決めてしまったからだった。そこで、動画に重ねること以外にも条件を加えて、「いちばんよい」位置を1つに決める。そのときに使うのが<strong>最小二乗法</strong>だ。まず簡単な例から。ある長さを3回測って、2 cm、3 cm、7 cm だったとする。本当の長さとしていちばんよいのは、いくつだろう？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">平均の 4 cm でしょうか。でも、「いちばんよい」はどう決めるんですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">答えの候補を x として、測った値とのずれ x − 2、x − 3、x − 7 を考える。ずれはプラスにもマイナスにもなるから、2乗して足した<br><strong>S(x) ＝ (x − 2)² ＋ (x − 3)² ＋ (x − 7)²</strong><br>を「ずれの大きさ」とし、これがいちばん小さくなる x を選ぶ。これが最小二乗法だ。下の図で x を動かして、S がいちばん小さくなる所を探してごらん。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv2" role="img" aria-label="測った値（2, 3, 7）と候補の値 x のずれを、正方形の面積（ずれの2乗）で表す。x を動かすと、面積の合計 S が変わり、平均の4でいちばん小さくなる"></canvas></div>
+        <div class="sim-controls">
+          <label>候補の値 x <input type="range" id="x2" min="0" max="9" value="6" step="0.05"> <output id="x2o"></output></label>
+        </div>
+        <div class="readout" id="ro2"></div>
+        <div class="diagram-caption">上の数直線の茶色の点が測った値、ピンクの線が候補の値 x。測った値の上の正方形は、ずれの大きさを1辺とする正方形で、面積が「ずれの2乗」。下のグラフは合計 S(x)。いちばん低い所は x ＝ 4（3つの平均）</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">x ＝ 4 で S が 14 になって、いちばん小さくなりました。S(x) を展開すると 3x² − 24x ＋ 62 で、3(x − 4)² ＋ 14 と書き直せるので、x ＝ 4 のとき最小です。ちゃんと平均になっています。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">見事だ。2乗の合計を最小にすると、自然に平均が出てくる。ステージ6の重心も、ステージ8のフィルタも、重みつき平均だったね。実は、重みつき平均は、重みつきの2乗の合計 Σ w(x − xᵢ)² を最小にする答えでもある。いままで出てきた平均は、全部この考え方でつながっているんだ。<br>アニメーションを動画に重ねたときは、毎コマ、体の点の位置を少しずつ動かしながら、次の量をいちばん小さくした。<br><strong>S ＝ 100 ×（動画の画面上のずれ）² ＋ 60 ×（正面から見た形の変化）² ＋ 3 ×（的の方向の位置の変化）² ＋ 300 ×（骨の長さの変化）²</strong><br>正面から見た図、つまり目標側から見た図には、的の方向の位置は写らない。正面の図にとっては、的の方向が「奥行き」なんだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">数が大きい条件ほど、強く守られるということですか？ 的の方向の変化は 3 と小さいので、正面から見えない向きには動かしてもよい、という意味でしょうか。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。動画のカメラは斜めから撮っているので、光の通り道は的の方向にも傾いている。だから、正面から見えない的の方向に点をずらせば、正面から見た形を変えずに光の通り道に乗せられる。骨の長さは変わってはいけないから、いちばん重い 300 にした。重みの大きさで、どの条件をどれだけ優先するかを決めるんだ。下の図は、1つの点だけで考えた小さな模型だ。上から見ていて、左下のカメラからの光の通り道（点線）の上に点を乗せれば、動画と重なる。もとの位置（黒）は通り道から外れている。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="上から見た模型。カメラからの光の通り道と、もとの点。重みを変えると、ずれの2乗の合計がいちばん小さくなる点（ピンク）が動く。等高線は合計の大きさ"></canvas></div>
+        <div class="sim-controls">
+          <label>動画に重ねる重み <input type="range" id="wv3" min="0" max="200" value="100" step="1"> <output id="wv3o"></output></label>
+          <label>的の方向を変えない重み <input type="range" id="wx3" min="0" max="200" value="3" step="1"> <output id="wx3o"></output></label>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">上から見た図。横向きが的の方向（正面から見た図には写らない）、縦向きが正面から見た図に写る向き。黒＝もとの点、点線＝左下のカメラから動画の点に向かう光の通り道、ピンク＝合計 S がいちばん小さくなる点、灰色の楕円は S が同じ大きさになる線（等高線）。正面から見た形を変えない重みは 60 に固定</div>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">的の方向の重みが 3 のときは、ピンクの点がほとんど横（的の方向）にだけ動いて、光の通り道に乗りました。その重みを 60 に上げると、ピンクの点は縦にも動いて、正面から見た形が変わってしまいます。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだ。正面から見えない向きを自由にしておけば、正面から見た形をほとんど変えずに動画に重ねられる。実際のチート900では、この計算を24個の点と骨の長さの条件で、毎コマ行った。式が複雑なので、一度に答えは出せない。そこで「いまの位置から、S が小さくなる向きへ少しだけ動かす」をくり返して、S がそれ以上小さくならない所まで進める。この方法をくり返し計算（ここで使ったのはレーベンバーグ・マーカート法）という。こうして、正面から見た形の変化を平均 2 cm ほどに抑えたまま、動画にぴったり重ねることができたんだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">ベクトル、内積と外積、回転行列、四元数、IK、重心と放物線、角運動量、フィルタ、そして最小二乗法。ひとつのキックのアニメーションに、こんなにたくさんの数学が使われていたんですね。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">どれも、ばらばらの道具ではない。「矢印を足す・測る・回す」と「重みつきで平均する」の2つが、形を変えて何度も出てきた。ゲームやロボット、映画のCGでも、中で動いているのは同じ道具だ。次に3Dの動きを見たら、どんな計算が隠れているか、想像してみてほしい。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">【このステージの成果】</span>
+        <span class="step">投影：<span class="nw">d ＝ P − E</span>、<span class="nw">a ＝ d·r、b ＝ d·u、c ＝ d·f</span>、画面の位置 ＝ <span class="nw">(焦点距離 × a ÷ c, 焦点距離 × b ÷ c)</span></span>
+        <span class="step">光の通り道に沿って動かしても画面上は動かない → 動画1本からは奥行きが決まらない</span>
+        <span class="step">最小二乗法：ずれの2乗の合計 <span class="nw">S ＝ Σ (x − xᵢ)²</span> を最小にする。答えは平均（重みつきなら重みつき平均）</span>
+        <span class="step">条件ごとに重みをつけて足し、S を最小にする。正面から見えない向き（的の方向）の重みを小さくすれば、正面から見た形を守ったまま動画に重ねられる</span>
+      </div>
+
+      <h2 class="quiz-head">確認クイズ</h2>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q1. 3Dの点を、カメラからの光の通り道に沿って奥へ動かした。カメラの画面の上で、点の位置はどうなる？</p>
+        <div class="choice-list">
+          <button class="choice-btn">右へずれる</button>
+          <button class="choice-btn">画面の中心へ近づく</button>
+          <button class="choice-btn">変わらない</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 光の通り道に沿って動かすと a、b、c が同じ割合で変わるので、a ÷ c と b ÷ c は変わらない。だから動画1本からは奥行きが決まらない。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q2. 3回測って 2、3、7 だった。ずれの2乗の合計 S(x) ＝ (x−2)² ＋ (x−3)² ＋ (x−7)² がいちばん小さくなる x は？</p>
+        <div class="choice-list">
+          <button class="choice-btn">4</button>
+          <button class="choice-btn">3</button>
+          <button class="choice-btn">7</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ S(x) ＝ 3(x − 4)² ＋ 14 なので、x ＝ 4（3つの平均）で最小。</div>
+      </div>
+      <div class="quiz-card" data-quiz>
+        <p class="quiz-q">Q3. 動画に重ねるとき、「正面から見た形を変えない」という条件も加えたのはなぜ？</p>
+        <div class="choice-list">
+          <button class="choice-btn">計算を速くするため</button>
+          <button class="choice-btn">動画1本では奥行きが決まらないので、別の条件で1つに決めるため</button>
+          <button class="choice-btn">重力の影響を入れるため</button>
+        </div>
+        <div class="quiz-explain" hidden>正解！ 動画と重なる位置は光の通り道の上にいくらでもある。正面から見た形や骨の長さの条件を重みつきで加えると、いちばんよい位置が1つに決まる。</div>
+      </div>
+
+      <div class="stage-nav">
+        <a class="btn" href="index.html">← トップへ</a>
+        <button class="btn btn-primary" id="btn-next" disabled>次へ →</button>
+      </div>
+
+      <div id="book-recommend"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/progress.js?v=20261018a"></script>
+<script src="js/motion.js?v=20261018a"></script>
+<script src="js/engine.js?v=20261018a"></script>
+<script>RQ.initStagePage(9);</script>
+<script>
+/* ---------- シミュレータ1：奥行きが消える ---------- */
+(function(){
+  var k=79, dp=0, sa, sb, ca, cb, LEG=['kneeR','ankleR','heelR','toeR'];
+  function moved(p){
+    var E=ca.basis().eye, q={}; Object.keys(p).forEach(function(n){q[n]=p[n];});
+    LEG.forEach(function(n){var d=PE.sub(p[n],E); q[n]=PE.add(p[n],PE.mul(PE.norm(d),dp));});
+    return q;
+  }
+  function leg(ctx,cam,p,col,w){var ch=['hipR'].concat(LEG); ctx.strokeStyle=col; ctx.lineWidth=w; ctx.lineCap='round'; ctx.beginPath(); ch.forEach(function(n,i){var s=cam.proj(p[n]); if(i)ctx.lineTo(s.x,s.y); else ctx.moveTo(s.x,s.y);}); ctx.stroke(); ctx.lineCap='butt';}
+  function scene(st,cam,isFront){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var p=PE.pose(k), q=moved(p), c=PE.com(k); if(isFront) cam.target=[c[0],1.0,c[2]];
+    PE.floor(ctx,cam,c[0]-2,c[0]+2,-1.5,1.5,0.5);
+    PE.drawBody(ctx,cam,q,{alpha:0.85});
+    leg(ctx,cam,p,'rgba(200,67,63,.3)',6);
+    leg(ctx,cam,q,PE.C.legR,3);
+    if(isFront){var E=ca.basis().eye; ctx.strokeStyle=PE.C.muted; ctx.setLineDash([3,4]); ctx.lineWidth=1.2; LEG.forEach(function(n){var A=cam.proj(PE.add(p[n],PE.mul(PE.norm(PE.sub(p[n],E)),-0.9))), B=cam.proj(PE.add(p[n],PE.mul(PE.norm(PE.sub(p[n],E)),0.9))); ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();}); ctx.setLineDash([]);}
+    PE.text(ctx,8,14,isFront?'目標側（正面）から':'動画のカメラから',PE.C.ink,11.5,900,'left');
+  }
+  function readout(){
+    if(!sa||!sb||!ca||!cb) return;
+    var p=PE.pose(k), q=moved(p), px=0, cm=0;
+    LEG.forEach(function(n){var a=ca.proj(p[n]), b=ca.proj(q[n]); px=Math.max(px,Math.hypot(a.x-b.x,a.y-b.y)); var a2=cb.proj(p[n]), b2=cb.proj(q[n]); cm=Math.max(cm,Math.hypot(a2.x-b2.x,a2.y-b2.y)/a2.s);});
+    var th0=PE.len(PE.sub(p.kneeR,p.hipR)), th1=PE.len(PE.sub(q.kneeR,q.hipR));
+    document.getElementById('ro1').innerHTML='<span>動画の画面上の動き <b>'+PE.fmt(px,1)+'</b> 画素</span><span>正面から見た動き（最大） <b>'+PE.fmt(cm*100,0)+'</b> cm</span><span>太ももの長さ <b>'+PE.fmt(th0*100,1)+'</b> → <b>'+PE.fmt(th1*100,1)+'</b> cm</span>';
+  }
+  sa=PE.canvas('cv1a',1.05,function(s){if(ca){scene(s,ca,false);}});
+  sb=PE.canvas('cv1b',1.05,function(s){if(cb){scene(s,cb,true); readout();}});
+  ca=PE.camera(sa,{yaw:22,pitch:6,dist:6,target:[1.0,1.0,0],scale:1.0,drag:false});
+  cb=PE.camera(sb,{yaw:90,pitch:4,dist:6,target:[1.0,1.0,0],scale:1.0,persp:false,drag:false});
+  function redraw(){sa.redraw(); sb.redraw();}
+  PE.bindRange('k1','k1o',function(v){return PE.fmt(v/PE.fps,2)+' 秒';},function(v){k=v;redraw();});
+  PE.bindRange('dp1','dp1o',function(v){return (v>0?'＋':'')+PE.fmt(v*100,0)+' cm';},function(v){dp=v;redraw();});
+  redraw();
+})();
+
+/* ---------- シミュレータ2：ずれの2乗の合計 ---------- */
+(function(){
+  var x=6, D=[2,3,7], st;
+  function S(v){return D.reduce(function(s,d){return s+(v-d)*(v-d);},0);}
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var L=34,R=W-14, X=function(v){return L+(R-L)*v/9;}, u=(R-L)/9, yl=H*0.46;
+    /* 正方形（ずれの2乗） */
+    D.forEach(function(d,i){var a=Math.min(d,x), e=Math.abs(x-d), top=yl-6-i*0; ctx.fillStyle=['rgba(200,67,63,.22)','rgba(47,111,184,.22)','rgba(47,143,101,.22)'][i]; ctx.strokeStyle=['#c8433f','#2f6fb8','#2f8f65'][i]; ctx.lineWidth=1.4;
+      var sz=e*u*0.42, x0=x>=d?X(d):X(d)-sz; ctx.fillRect(x0,yl-sz,sz,sz); ctx.strokeRect(x0,yl-sz,sz,sz);});
+    ctx.strokeStyle=PE.C.ink; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(L,yl); ctx.lineTo(R,yl); ctx.stroke();
+    for(var v=0;v<=9;v++){ctx.beginPath();ctx.moveTo(X(v),yl-4);ctx.lineTo(X(v),yl+4);ctx.stroke();PE.text(ctx,X(v),yl+14,v,PE.C.muted,10.5,700);}
+    D.forEach(function(d){ctx.fillStyle=PE.C.spine; ctx.beginPath(); ctx.arc(X(d),yl,6,0,PE.TAU); ctx.fill();});
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(X(x),14); ctx.lineTo(X(x),yl+4); ctx.stroke(); PE.text(ctx,X(x),8,'x',PE.C.com,12,900);
+    /* S(x) のグラフ */
+    var T=yl+30,B=H-12, Y=function(s){return B-(B-T)*Math.min(s,70)/70;};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; [0,35,70].forEach(function(s){ctx.beginPath();ctx.moveTo(L,Y(s));ctx.lineTo(R,Y(s));ctx.stroke();PE.text(ctx,L-4,Y(s),s,PE.C.muted,10,700,'right');});
+    ctx.strokeStyle=PE.C.acc; ctx.lineWidth=2.4; ctx.beginPath(); for(var i=0;i<=180;i++){var vv=9*i/180; if(i)ctx.lineTo(X(vv),Y(S(vv))); else ctx.moveTo(X(vv),Y(S(vv)));} ctx.stroke();
+    ctx.fillStyle=PE.C.com; ctx.beginPath(); ctx.arc(X(x),Y(S(x)),5,0,PE.TAU); ctx.fill();
+    PE.text(ctx,R-4,T+2,'S(x)',PE.C.acc,12,900,'right');
+    document.getElementById('ro2').innerHTML='<span>(x−2)² ＋ (x−3)² ＋ (x−7)² = '+D.map(function(d){return PE.fmt((x-d)*(x-d),2);}).join(' ＋ ')+' = <b>'+PE.fmt(S(x),2)+'</b></span>';
+  }
+  st=PE.canvas('cv2',0.62,draw);
+  PE.bindRange('x2','x2o',function(v){return PE.fmt(v,2);},function(v){x=v;st.redraw();});
+})();
+
+/* ---------- シミュレータ3：重みつきの最小二乗 ---------- */
+(function(){
+  var wv=100, wf=60, wx=3, st, C=[-1.4,-0.7], P0=[0,0], V=[0.45,0.1];   /* 上から見た平面：[的の方向, 正面から見える向き] */
+  var n=(function(){var d=[V[0]-C[0],V[1]-C[1]], l=Math.hypot(d[0],d[1]); return [-d[1]/l, d[0]/l];})();   /* 光の通り道に直角な向き */
+  function cost(p){var e=(p[0]-C[0])*n[0]+(p[1]-C[1])*n[1]; return wv*e*e + wx*(p[0]-P0[0])*(p[0]-P0[0]) + wf*(p[1]-P0[1])*(p[1]-P0[1]);}
+  function solve(){
+    /* (wv n nᵀ + diag(wx, wf)) p = wv n nᵀ C + diag(wx, wf) P0 を解く */
+    var nc=n[0]*C[0]+n[1]*C[1];
+    var a=wv*n[0]*n[0]+wx, b=wv*n[0]*n[1], d=wv*n[1]*n[1]+wf;
+    var r0=wv*n[0]*nc+wx*P0[0], r1=wv*n[1]*nc+wf*P0[1], det=a*d-b*b;
+    if(Math.abs(det)<1e-9) return P0.slice();
+    return [(d*r0-b*r1)/det, (a*r1-b*r0)/det];
+  }
+  function draw(st){
+    var ctx=st.ctx,W=st.W,H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W/2.6,H/1.6), O={x:W*0.6,y:H*0.45}, P=function(q){return {x:O.x+q[0]*s, y:O.y-q[1]*s};};
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; for(var g=-1.6;g<=0.81;g+=0.2){var A=P([g,-0.8]),B=P([g,0.6]);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();} for(g=-0.8;g<=0.61;g+=0.2){A=P([-1.6,g]);B=P([0.8,g]);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();}
+    /* 等高線 */
+    var best=solve(), Smin=cost(best);
+    [0.5,2,4.5,8].forEach(function(lv){
+      var target=Smin+lv; ctx.strokeStyle='rgba(106,118,132,.45)'; ctx.lineWidth=1; ctx.beginPath();
+      for(var i=0;i<=120;i++){var t=PE.TAU*i/120, dir=[Math.cos(t),Math.sin(t)], lo=0, hi=3;
+        for(var it=0;it<30;it++){var m=(lo+hi)/2; if(cost([best[0]+dir[0]*m,best[1]+dir[1]*m])<target) lo=m; else hi=m;}
+        var q=P([best[0]+dir[0]*lo,best[1]+dir[1]*lo]); if(i)ctx.lineTo(q.x,q.y); else ctx.moveTo(q.x,q.y);}
+      ctx.stroke();});
+    /* 光の通り道 */
+    var c=P(C), far=P([C[0]+(V[0]-C[0])*1.7, C[1]+(V[1]-C[1])*1.7]);
+    ctx.strokeStyle=PE.C.ink; ctx.setLineDash([5,4]); ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(far.x,far.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=PE.C.ink; ctx.fillRect(c.x-9,c.y-7,14,14); PE.text(ctx,c.x,c.y+18,'カメラ',PE.C.ink,11,900);
+    var p0=P(P0), pb=P(best);
+    ctx.strokeStyle=PE.C.com; ctx.lineWidth=1.6; PE.arrowPx(ctx,p0.x,p0.y,pb.x,pb.y,PE.C.com,1.8,7);
+    ctx.fillStyle=PE.C.ink; ctx.beginPath(); ctx.arc(p0.x,p0.y,6,0,PE.TAU); ctx.fill(); PE.text(ctx,p0.x+8,p0.y+14,'もと',PE.C.ink,11,900,'left');
+    ctx.fillStyle=PE.C.com; ctx.beginPath(); ctx.arc(pb.x,pb.y,6,0,PE.TAU); ctx.fill();
+    PE.arrowPx(ctx,O.x+0.55*s,H-14,O.x+0.85*s,H-14,PE.C.muted,1.4,6); PE.text(ctx,O.x+0.5*s,H-14,'的の方向',PE.C.muted,10.5,800,'right');
+    var e=(best[0]-C[0])*n[0]+(best[1]-C[1])*n[1];
+    document.getElementById('ro3').innerHTML='<span>動画とのずれ <b>'+PE.fmt(Math.abs(e)*100,1)+'</b> cm</span><span>的の方向の変化 <b>'+PE.fmt((best[0]-P0[0])*100,1)+'</b> cm</span><span>正面から見た左右の変化 <b>'+PE.fmt((best[1]-P0[1])*100,1)+'</b> cm</span>';
+  }
+  st=PE.canvas('cv3',0.66,draw);
+  PE.bindRange('wv3','wv3o',function(v){return v;},function(v){wv=v;st.redraw();});
+  PE.bindRange('wx3','wx3o',function(v){return v;},function(v){wx=v;st.redraw();});
+})();
+</script>
+</body>
+</html>
