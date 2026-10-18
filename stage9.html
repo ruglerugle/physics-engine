@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -163,8 +163,17 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">カメラには3本の向きがある。画面の右へ向かう向き <strong>r</strong>、上へ向かう向き <strong>u</strong>、カメラが見ている奥への向き <strong>f</strong>。どれも長さ1で、互いに直角だ。カメラの位置を E、写したい点を P として、d ＝ P − E とする。ステージ2の内積を使えば、d がそれぞれの向きにどれだけ進んでいるかがわかる。<br><strong>右へ a ＝ d·r、 上へ b ＝ d·u、 奥へ c ＝ d·f</strong><br>そして、遠い物ほど小さく見えるので、奥行き c で割る。<br><strong>画面の位置 ＝ (焦点距離 × a ÷ c, 焦点距離 × b ÷ c)</strong><br>焦点距離は、カメラのレンズで決まる拡大の倍率だと思えばいい。</div>
+          <div class="dialog-bubble">カメラには3本の向きがある。画面の右へ向かう向き <strong>r</strong>、上へ向かう向き <strong>u</strong>、カメラが見ている奥への向き <strong>f</strong>。どれも長さ1で、互いに直角だ。カメラの位置を E、写したい点を P として、d ＝ P − E とする。ステージ2の内積を使えば、d がそれぞれの向きにどれだけ進んでいるかがわかる。そして、遠い物ほど小さく見えるので、奥行き c で割る。焦点距離は、カメラのレンズで決まる拡大の倍率だと思えばいい。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">カメラから点へ：<span class="nw">d ＝ P − E</span></span>
+        <span class="step">3本の向きとの内積：<span class="nw">右へ a ＝ d・r、</span> <span class="nw">上へ b ＝ d・u、</span> <span class="nw">奥へ c ＝ d・f</span></span>
+        <span class="step">画面の位置：<span class="nw">(焦点距離 × a ÷ c,</span> <span class="nw">焦点距離 × b ÷ c)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -221,8 +230,12 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">答えの候補を x として、測った値とのずれ x − 2、x − 3、x − 7 を考える。ずれはプラスにもマイナスにもなるから、2乗して足した<br><strong>S(x) ＝ (x − 2)² ＋ (x − 3)² ＋ (x − 7)²</strong><br>を「ずれの大きさ」とし、これがいちばん小さくなる x を選ぶ。これが最小二乗法だ。下の図で x を動かして、S がいちばん小さくなる所を探してごらん。</div>
+          <div class="dialog-bubble">答えの候補を x として、測った値とのずれ x − 2、x − 3、x − 7 を考える。ずれはプラスにもマイナスにもなるから、2乗して足したものを「ずれの大きさ」とし、これがいちばん小さくなる x を選ぶ。これが最小二乗法だ。下の図で x を動かして、S がいちばん小さくなる所を探してごらん。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">ずれの2乗の合計：<span class="nw">S(x) ＝ (x − 2)² ＋ (x − 3)² ＋ (x − 7)²</span></span>
       </div>
 
       <div class="diagram-box">
@@ -247,8 +260,15 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">見事だ。2乗の合計を最小にすると、自然に平均が出てくる。ステージ6の重心も、ステージ8のフィルタも、重みつき平均だったね。実は、重みつき平均は、重みつきの2乗の合計 Σ w(x − xᵢ)² を最小にする答えでもある。いままで出てきた平均は、全部この考え方でつながっているんだ。<br>アニメーションを動画に重ねたときは、毎コマ、体の点の位置を少しずつ動かしながら、次の量をいちばん小さくした。<br><strong>S ＝ 100 ×（動画の画面上のずれ）² ＋ 60 ×（正面から見た形の変化）² ＋ 3 ×（的の方向の位置の変化）² ＋ 300 ×（骨の長さの変化）²</strong><br>正面から見た図、つまり目標側から見た図には、的の方向の位置は写らない。正面の図にとっては、的の方向が「奥行き」なんだ。</div>
+          <div class="dialog-bubble">見事だ。2乗の合計を最小にすると、自然に平均が出てくる。ステージ6の重心も、ステージ8のフィルタも、重みつき平均だったね。実は、重みつき平均は、重みつきの2乗の合計 Σ w(x − xᵢ)² を最小にする答えでもある。いままで出てきた平均は、全部この考え方でつながっているんだ。<br>アニメーションを動画に重ねたときは、毎コマ、体の点の位置を少しずつ動かしながら、4つの条件に重みをつけて足した量をいちばん小さくした。正面から見た図、つまり目標側から見た図には、的の方向の位置は写らない。正面の図にとっては、的の方向が「奥行き」なんだ。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">重みつきの2乗の合計：<span class="nw">S ＝ 100 ×（動画の画面上のずれ）²</span> <span class="nw">＋ 60 ×（正面から見た形の変化）²</span> <span class="nw">＋ 3 ×（的の方向の位置の変化）²</span> <span class="nw">＋ 300 ×（骨の長さの変化）²</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -353,9 +373,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(9);</script>
 <script>
 /* ---------- シミュレータ1：奥行きが消える ---------- */

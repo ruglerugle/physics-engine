@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -163,8 +163,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その「不思議」を数で説明しよう。まず、重さ m のおもりが、軸から距離 r の所を回っているとする。1秒に回る角度を<strong>角速度</strong> ω（オメガ）という。角度をラジアン（半径と同じ長さの弧に対する角度。1回転が 2π ≈ 6.28）で測ると、おもりの速さは v ＝ rω だ。このとき、<br><strong>角運動量 L ＝ m × r × v ＝ m r² ω</strong><br>を「回る勢い」と考える。外から回す力（トルク）がはたらかないと、L は変わらない。これを<strong>角運動量の保存</strong>という。</div>
+          <div class="dialog-bubble">その「不思議」を数で説明しよう。まず、重さ m のおもりが、軸から距離 r の所を回っているとする。1秒に回る角度を<strong>角速度</strong> ω（オメガ）という。角度をラジアン（半径と同じ長さの弧に対する角度。1回転が 2π ≈ 6.28）で測ると、おもりの速さは v ＝ rω だ。このとき、次の<strong>角運動量</strong>を「回る勢い」と考える。外から回す力（トルク）がはたらかないと、L は変わらない。これを<strong>角運動量の保存</strong>という。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">おもりの速さ：<span class="nw">v ＝ rω</span></span>
+        <span class="step">角運動量：<span class="nw">L ＝ m × r × v ＝ m r² ω</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -177,8 +185,13 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その通り。かっこの中、<strong>I ＝ Σ m r²</strong>（Σ は「全部足す」という記号）を<strong>慣性モーメント</strong>という。回しにくさを表す数だ。L ＝ Iω で L が変わらないなら、<strong>ω ＝ L ÷ I</strong>。I が半分になれば ω は2倍になる。r が2乗で効くことに注意してほしい。腕を半分の距離まで引き寄せると、その腕の m r² は4分の1になる。下の図で試してごらん。</div>
+          <div class="dialog-bubble">その通り。かっこの中（Σ は「全部足す」という記号）を<strong>慣性モーメント</strong>という。回しにくさを表す数だ。L が変わらないなら、回る速さは L を I で割ったものになる。I が半分になれば ω は2倍になる。r が2乗で効くことに注意してほしい。腕を半分の距離まで引き寄せると、その腕の m r² は4分の1になる。下の図で試してごらん。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">慣性モーメント：<span class="nw">I ＝ Σ m r²</span></span>
+        <span class="step">角運動量：<span class="nw">L ＝ Iω</span> → <span class="nw">ω ＝ L ÷ I</span></span>
       </div>
 
       <div class="diagram-box">
@@ -244,8 +257,17 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">よいところに気づいたね。実は、回しにくさは<strong>どの軸のまわりに回すか</strong>で変わる。鉛筆を思い浮かべてごらん。長い向きを軸にして指でくるくる回すのは簡単だが、真ん中をつまんで端と端が円を描くように回すのは、ずっと回しにくい。軸の向きを長さ1のベクトル n で表すと、その軸のまわりの I は、各おもりについて「軸からの距離の2乗」を足したものだ。重心からおもりへのベクトルを r とすると、軸からの距離の2乗は |r|² − (r·n)²（ステージ2の内積で、r のうち軸に沿った部分を引いたもの）。これを整理すると、<br><strong>I(n) ＝ nᵀ 𝐈 n、 𝐈 ＝ Σ m (|r|² E − r rᵀ)</strong><br>と書ける。E は対角に1が並ぶ3×3の表（単位行列）、r rᵀ は r の成分どうしを掛けた3×3の表だ。この 𝐈 を<strong>慣性テンソル</strong>という。</div>
+          <div class="dialog-bubble">よいところに気づいたね。実は、回しにくさは<strong>どの軸のまわりに回すか</strong>で変わる。鉛筆を思い浮かべてごらん。長い向きを軸にして指でくるくる回すのは簡単だが、真ん中をつまんで端と端が円を描くように回すのは、ずっと回しにくい。軸の向きを長さ1のベクトル n で表すと、その軸のまわりの I は、各おもりについて「軸からの距離の2乗」を足したものだ。重心からおもりへのベクトルを r とすると、軸からの距離の2乗は、ステージ2の内積で r のうち軸に沿った部分を引いたものだ。これを整理すると、3×3の表 𝐈 を使って書ける。E は対角に1が並ぶ3×3の表（単位行列）、r rᵀ は r の成分どうしを掛けた3×3の表だ。この 𝐈 を<strong>慣性テンソル</strong>という。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">軸からの距離の2乗：<span class="nw">|r|² − (r・n)²</span></span>
+        <span class="step">軸 n のまわりの回しにくさ：<span class="nw">I(n) ＝ Σ m (|r|² − (r・n)²) ＝ nᵀ 𝐈 n</span></span>
+        <span class="step">慣性テンソル：<span class="nw">𝐈 ＝ Σ m (|r|² E − r rᵀ)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -368,9 +390,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(7);</script>
 <script>
 var MASS=60, AIR=[Math.round(PE.M.events.takeoff*PE.fps), Math.round(PE.M.events.landL*PE.fps)];

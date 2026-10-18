@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -208,8 +208,19 @@
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name student">うさ美</div>
           </div>
-          <div class="dialog-bubble">左の三角形で x² ＋ h² ＝ L₁²、右の三角形で (d−x)² ＋ h² ＝ L₂² です。2つの式を引き算すると h² が消えて、x² − (d−x)² ＝ L₁² − L₂²。左辺を展開すると x² − d² ＋ 2dx − x² ＝ 2dx − d² なので、2dx ＝ L₁² − L₂² ＋ d²。<strong>x ＝ (L₁² − L₂² ＋ d²) ÷ (2d)</strong> です。h は1つ目の式から <strong>h ＝ √(L₁² − x²)</strong>。</div>
+          <div class="dialog-bubble">左右の三角形でそれぞれ三平方の定理を書いて、2つの式を引き算すると h² が消えます。それで x が出て、h は1つ目の式から出ます。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">左の三角形：<span class="nw">x² ＋ h² ＝ L₁²</span></span>
+        <span class="step">右の三角形：<span class="nw">(d − x)² ＋ h² ＝ L₂²</span></span>
+        <span class="step">引き算（h² が消える）：<span class="nw">x² − (d − x)² ＝ L₁² − L₂²</span></span>
+        <span class="step">左辺を展開：<span class="nw">x² − d² ＋ 2dx − x² ＝ 2dx − d²</span> → <span class="nw">2dx ＝ L₁² − L₂² ＋ d²</span></span>
+        <span class="step">答え：<span class="nw">x ＝ (L₁² − L₂² ＋ d²) ÷ (2d)</span> 、 <span class="nw">h ＝ √(L₁² − x²)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row">
           <div class="dialog-character">
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -229,8 +240,13 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">そう、その「膝を出したい向き」を矢印で与える。これを<strong>ポール</strong>（極）と呼ぶことが多い。ポールの矢印から、u の向きの成分（内積で取り出せる）を引いて u に直角にし、長さを1にそろえたものを p とすれば、膝は<br><strong>K ＝ H ＋ x u ＋ h p</strong><br>で1点に決まる。ふつうは、ポールとして<strong>そのコマの膝の向き</strong>（今の膝の位置から作る）を使う。</div>
+          <div class="dialog-bubble">そう、その「膝を出したい向き」を矢印で与える。これを<strong>ポール</strong>（極）と呼ぶことが多い。ポールの矢印から、u の向きの成分（内積で取り出せる）を引いて u に直角にし、長さを1にそろえたものを p とすれば、膝は1点に決まる。ふつうは、ポールとして<strong>そのコマの膝の向き</strong>（今の膝の位置から作る）を使う。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">u に直角にする：<span class="nw">p ＝ ポール − (ポール・u) u</span> → 長さを1にそろえる</span>
+        <span class="step">膝の位置：<span class="nw">K ＝ H ＋ x u ＋ h p</span></span>
       </div>
 
       <div class="diagram-box">
@@ -371,9 +387,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(5);</script>
 <script>
 /* ---------- 2関節IK（平面） ---------- */

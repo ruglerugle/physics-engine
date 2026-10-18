@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -221,8 +221,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">そう、ずっと少ない。軸の向きが長さ1の矢印 k ＝ (k<sub>x</sub>, k<sub>y</sub>, k<sub>z</sub>)、回す角度が θ の回転は、次の四元数で表す。<br><strong>q ＝ ( cos(θ/2), k<sub>x</sub> sin(θ/2), k<sub>y</sub> sin(θ/2), k<sub>z</sub> sin(θ/2) )</strong><br>最初の数が w、残りの3つが x、y、z だ。4つの数の2乗の和は cos²(θ/2) ＋ sin²(θ/2)×(k<sub>x</sub>²＋k<sub>y</sub>²＋k<sub>z</sub>²) ＝ cos²(θ/2) ＋ sin²(θ/2) ＝ 1。<strong>回転を表す四元数は、いつも「長さ」が1</strong>になる。</div>
+          <div class="dialog-bubble">そう、ずっと少ない。軸の向きが長さ1の矢印 k ＝ (k<sub>x</sub>, k<sub>y</sub>, k<sub>z</sub>)、回す角度が θ の回転は、次の四元数で表す。最初の数が w、残りの3つが x、y、z だ。4つの数の2乗の和を計算すると1になる。<strong>回転を表す四元数は、いつも「長さ」が1</strong>になる。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">回転の四元数：<span class="nw">q ＝ ( cos(θ/2),</span> <span class="nw">k<sub>x</sub> sin(θ/2),</span> <span class="nw">k<sub>y</sub> sin(θ/2),</span> <span class="nw">k<sub>z</sub> sin(θ/2) )</span></span>
+        <span class="step">2乗の和：<span class="nw">cos²(θ/2) ＋ sin²(θ/2) × (k<sub>x</sub>² ＋ k<sub>y</sub>² ＋ k<sub>z</sub>²)</span> <span class="nw">＝ cos²(θ/2) ＋ sin²(θ/2) ＝ 1</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -289,8 +297,13 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">いいところに気づいたね。長さ1の四元数は、すべて「4次元の空間の、半径1の球面」の上にある。4つの数をそのまま平均すると、点は球面の内側にもぐって長さが1より短くなるが、<strong>長さで割って1に戻せば、ちゃんと回転を表す</strong>。行列とちがって、四元数は「縮んだら長さを1に戻す」だけで直せるんだ。さらに丁寧なのが <strong>slerp（スラープ）</strong>で、2つの点を結ぶ球面上のいちばん短い道（大円の弧）に沿って、一定の速さで進む。q₀ と q₁ の4次元の内積を cos Ω とすると、割合 t の途中は<br><strong>q(t) ＝ ( sin((1−t)Ω) q₀ ＋ sin(tΩ) q₁ ) ÷ sin Ω</strong><br>t＝0 なら q₀、t＝1 なら q₁ になり、その間は等しい角度ずつ回っていく。</div>
+          <div class="dialog-bubble">いいところに気づいたね。長さ1の四元数は、すべて「4次元の空間の、半径1の球面」の上にある。4つの数をそのまま平均すると、点は球面の内側にもぐって長さが1より短くなるが、<strong>長さで割って1に戻せば、ちゃんと回転を表す</strong>。行列とちがって、四元数は「縮んだら長さを1に戻す」だけで直せるんだ。さらに丁寧なのが <strong>slerp（スラープ）</strong>で、2つの点を結ぶ球面上のいちばん短い道（大円の弧）に沿って、一定の速さで進む。q₀ と q₁ の4次元の内積を cos Ω とすると、割合 t の途中は次の式で表せる。t＝0 なら q₀、t＝1 なら q₁ になり、その間は等しい角度ずつ回っていく。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">2つの向きの間の角：<span class="nw">cos Ω ＝ q₀・q₁</span></span>
+        <span class="step">slerp：<span class="nw">q(t) ＝ ( sin((1−t)Ω) q₀</span> <span class="nw">＋ sin(tΩ) q₁ ) ÷ sin Ω</span></span>
       </div>
 
       <div class="diagram-box">
@@ -374,9 +387,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(4);</script>
 <script>
 /* ---------- 四元数の道具 ---------- */

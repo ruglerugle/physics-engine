@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -176,8 +176,14 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">この計算を短く書くために、回った矢印を<strong>縦に並べて箱にする</strong>。左の列が回った e<sub>x</sub>、右の列が回った e<sub>y</sub> だ。この数の箱を<strong>行列</strong>といい、回転を表すものを<strong>回転行列</strong>という。<br><strong>R ＝ ( cos φ −sin φ ／ sin φ cos φ )</strong>（「／」で上の行と下の行を区切った）<br>行列とベクトルの掛け算 R(x, y) は、「行列の各行と (x, y) の内積を、上から並べたもの」と決める。上の行 (cos φ, −sin φ) と (x, y) の内積が x cos φ − y sin φ、下の行との内積が x sin φ ＋ y cos φ。さっきの答えそのものだ。</div>
+          <div class="dialog-bubble">この計算を短く書くために、回った矢印を<strong>縦に並べて箱にする</strong>。左の列が回った e<sub>x</sub>、右の列が回った e<sub>y</sub> だ。この数の箱を<strong>行列</strong>といい、回転を表すものを<strong>回転行列</strong>という。行列とベクトルの掛け算 R(x, y) は、「行列の各行と (x, y) の内積を、上から並べたもの」と決める。計算すると、さっきの答えそのものになる。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">回転行列：R ＝ <table class="mat"><tbody><tr><td>cos φ</td><td>−sin φ</td></tr><tr><td>sin φ</td><td>cos φ</td></tr></tbody></table></span>
+        <span class="step">上の行との内積：<span class="nw">(cos φ, −sin φ)・(x, y) ＝ x cos φ − y sin φ</span></span>
+        <span class="step">下の行との内積：<span class="nw">(sin φ, cos φ)・(x, y) ＝ x sin φ ＋ y cos φ</span></span>
       </div>
 
       <div class="diagram-box">
@@ -202,8 +208,15 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">同じだ。3次元では軸の矢印が3本 e<sub>x</sub>、e<sub>y</sub>、e<sub>z</sub> あるから、回った3本を列に並べた 3×3 の箱が回転行列になる。たとえば上向きの y 軸のまわりに φ 回すと――体が床の上でくるっと回る向きだね――y の矢印は動かず、x と z の矢印が床に平行な面の中で回る。<br><strong>R<sub>y</sub> ＝ ( cos φ 0 sin φ ／ 0 1 0 ／ −sin φ 0 cos φ )</strong><br>真ん中の列 (0, 1, 0) が「y の矢印は動かない」を表している。</div>
+          <div class="dialog-bubble">同じだ。3次元では軸の矢印が3本 e<sub>x</sub>、e<sub>y</sub>、e<sub>z</sub> あるから、回った3本を列に並べた 3×3 の箱が回転行列になる。たとえば上向きの y 軸のまわりに φ 回すと――体が床の上でくるっと回る向きだね――y の矢印は動かず、x と z の矢印が床に平行な面の中で回る。行列の真ん中の列 (0, 1, 0) が「y の矢印は動かない」を表している。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">y 軸のまわりに φ 回す：R<sub>y</sub> ＝ <table class="mat"><tbody><tr><td>cos φ</td><td>0</td><td>sin φ</td></tr><tr><td>0</td><td>1</td><td>0</td></tr><tr><td>−sin φ</td><td>0</td><td>cos φ</td></tr></tbody></table></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -285,8 +298,14 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その通り。直角な部分 v<sub>⊥</sub> が回る円の平面には、v<sub>⊥</sub> 自身と、それに直角でちょうど90° 先にある矢印 k×v が乗っている。k×v は外積だから k にも v<sub>⊥</sub> にも直角で、長さは |k| |v<sub>⊥</sub>| ＝ |v<sub>⊥</sub>|、ちょうど同じ長さだ。だから平面の回転と同じように、θ 回った後は <strong>v<sub>⊥</sub> cos θ ＋ (k×v) sin θ</strong>。これに動かない平行な部分を足すと、<br><strong>回した v ＝ v cos θ ＋ (k×v) sin θ ＋ k (k・v)(1−cos θ)</strong><br>これを<strong>ロドリゲスの回転公式</strong>という。最後の項は、v<sub>⊥</sub> cos θ を v cos θ と (k・v)k cos θ に分けて、平行な部分とまとめたものだ。</div>
+          <div class="dialog-bubble">その通り。直角な部分 v<sub>⊥</sub> が回る円の平面には、v<sub>⊥</sub> 自身と、それに直角でちょうど90° 先にある矢印 k×v が乗っている。k×v は外積だから k にも v<sub>⊥</sub> にも直角で、長さは |k| |v<sub>⊥</sub>| ＝ |v<sub>⊥</sub>|、ちょうど同じ長さだ。だから平面の回転と同じように、θ 回った後は v<sub>⊥</sub> cos θ ＋ (k×v) sin θ。これに動かない平行な部分を足してまとめたものを<strong>ロドリゲスの回転公式</strong>という。最後の項は、v<sub>⊥</sub> cos θ を v cos θ と (k・v)k cos θ に分けて、平行な部分とまとめたものだ。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">平行な部分（動かない）：<span class="nw">v<sub>∥</sub> ＝ (k・v) k</span></span>
+        <span class="step">直角な部分（θ 回る）：<span class="nw">v<sub>⊥</sub> cos θ ＋ (k×v) sin θ</span></span>
+        <span class="step">ロドリゲスの回転公式：<span class="nw">回した v ＝ v cos θ ＋ (k×v) sin θ</span> <span class="nw">＋ k (k・v)(1 − cos θ)</span></span>
       </div>
 
       <div class="diagram-box">
@@ -372,9 +391,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(3);</script>
 <script>
 /* ---------- 共通：ロドリゲスの回転 ---------- */

@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -162,8 +162,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その通り。いちばん簡単なのは、そのコマと前後2コマずつ、合わせて5コマの値を足して5で割る方法だ。これを<strong>移動平均</strong>という。ずれが右へ出たり左へ出たりでたらめなら、平均するとずれが打ち消し合って小さくなる。ただ、5コマを同じ重さで扱うより、近いコマを重く、遠いコマを軽く扱うほうが自然だ。そこで、重さを釣り鐘の形に並べる。コマの差を d として、重さを<br><strong>w(d) ＝ e<sup>−d² ÷ (2σ²)</sup></strong><br>とし、重さの合計で割る。σ（シグマ）は釣り鐘の幅で、σ コマ離れると重さは約 0.61 倍、2σ 離れると約 0.14 倍になる。この重さの並びを<strong>ガウスフィルタ</strong>という。ステージ6の重心と同じ、<strong>重みつき平均</strong>だね。</div>
+          <div class="dialog-bubble">その通り。いちばん簡単なのは、そのコマと前後2コマずつ、合わせて5コマの値を足して5で割る方法だ。これを<strong>移動平均</strong>という。ずれが右へ出たり左へ出たりでたらめなら、平均するとずれが打ち消し合って小さくなる。ただ、5コマを同じ重さで扱うより、近いコマを重く、遠いコマを軽く扱うほうが自然だ。そこで、重さを釣り鐘の形に並べる。コマの差を d として、重さを次の式で決め、重さの合計で割る。σ（シグマ）は釣り鐘の幅で、σ コマ離れると重さは約 0.61 倍、2σ 離れると約 0.14 倍になる。この重さの並びを<strong>ガウスフィルタ</strong>という。ステージ6の重心と同じ、<strong>重みつき平均</strong>だね。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">重さ：<span class="nw">w(d) ＝ e<sup>−d² ÷ (2σ²)</sup></span></span>
+        <span class="step">ならした値：<span class="nw">Σ w(d) x(k＋d) ÷ Σ w(d)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -338,9 +346,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(8);</script>
 <script>
 /* 決まった並びの乱数（毎回同じぶれになるように） */

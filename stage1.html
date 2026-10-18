@@ -55,7 +55,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -290,8 +290,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">それが<strong>加速度</strong>だ。1秒あたり速度がどれだけ変わるかで、単位は m/s²（メートル毎秒毎秒）。まとめると、表の数から、<strong>位置 → 差をとって60倍 → 速度 → 差をとって60倍 → 加速度</strong>と、2段階で計算できる。式で書けば、コマ k の位置を p(k) として、速度は (p(k＋1)−p(k))×60、加速度は (p(k＋1)−2p(k)＋p(k−1))×60² だ。</div>
+          <div class="dialog-bubble">それが<strong>加速度</strong>だ。1秒あたり速度がどれだけ変わるかで、単位は m/s²（メートル毎秒毎秒）。まとめると、表の数から、<strong>位置 → 差をとって60倍 → 速度 → 差をとって60倍 → 加速度</strong>と、2段階で計算できる。コマ k の位置を p(k) として式で書くと、次のようになる。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">速度：<span class="nw">(p(k＋1) − p(k)) × 60</span></span>
+        <span class="step">加速度：<span class="nw">(p(k＋1) − 2p(k)</span> <span class="nw">＋ p(k−1)) × 60²</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -445,9 +453,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(1);</script>
 <script>
 /* ---------- 共通：空中の区間（両足とも床から 3cm 以上離れているコマ） ---------- */

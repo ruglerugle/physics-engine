@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -162,8 +162,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その通り。この式を一般の形に直してみよう。重さ m₁ のおもりが位置 x₁、重さ m₂ が位置 x₂ にあるとき、つり合う位置 X は m₁(X − x₁) ＝ m₂(x₂ − X) から、<br><strong>X ＝ (m₁x₁ ＋ m₂x₂) ÷ (m₁ ＋ m₂)</strong><br>「位置に重さを掛けて足し、重さの合計で割る」。これを<strong>重みつき平均</strong>といい、つり合う点が<strong>重心</strong>だ。おもりがいくつあっても、3次元でも、x・y・z それぞれで同じ計算をすればいい。</div>
+          <div class="dialog-bubble">その通り。この式を一般の形に直してみよう。重さ m₁ のおもりが位置 x₁、重さ m₂ が位置 x₂ にあるとき、つり合う位置 X は、左右の「重さ × 支点からの距離」が等しいという式から出る。「位置に重さを掛けて足し、重さの合計で割る」。これを<strong>重みつき平均</strong>といい、つり合う点が<strong>重心</strong>だ。おもりがいくつあっても、3次元でも、x・y・z それぞれで同じ計算をすればいい。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">つり合いの式：<span class="nw">m₁(X − x₁) ＝ m₂(x₂ − X)</span></span>
+        <span class="step">重心：<span class="nw">X ＝ (m₁x₁ ＋ m₂x₂) ÷ (m₁ ＋ m₂)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -221,8 +229,17 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">そう。離陸の瞬間の重心の高さを y₀、上向きの速さを v₀ とすると、t 秒後の上向きの速さは v₀ − 9.8t。速さが一定の割合で変わるとき、進む距離は「最初と最後の速さの平均 × 時間」で出せるから、高さは<br><strong>y(t) ＝ y₀ ＋ v₀t − ½ × 9.8 × t²</strong><br>水平は速さが一定だから、x(t) ＝ x₀ ＋ (水平の速さ) × t。この2つを合わせた道すじが<strong>放物線</strong>だ。手足をどう動かしても、重心はこの放物線から外れられない。</div>
+          <div class="dialog-bubble">そう。離陸の瞬間の重心の高さを y₀、上向きの速さを v₀ とすると、t 秒後の上向きの速さは v₀ − 9.8t。速さが一定の割合で変わるとき、進む距離は「最初と最後の速さの平均 × 時間」で出せる。水平は速さが一定だ。この2つを合わせた道すじが<strong>放物線</strong>だ。手足をどう動かしても、重心はこの放物線から外れられない。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">上向きの速さ：<span class="nw">v(t) ＝ v₀ − 9.8t</span></span>
+        <span class="step">高さ：<span class="nw">y(t) ＝ y₀ ＋ v₀t − ½ × 9.8 × t²</span></span>
+        <span class="step">水平：<span class="nw">x(t) ＝ x₀ ＋ (水平の速さ) × t</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -275,8 +292,16 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">だからこそ、どれだけ高く跳べるかは、離陸の瞬間にもう決まっている。いちばん高い所では上向きの速さが 0 になるから、v₀ − 9.8t ＝ 0 より t ＝ v₀ ÷ 9.8 秒後。そのときの上がった高さは v₀t − 4.9t² ＝ <strong>v₀² ÷ (2 × 9.8)</strong>。このチート900は、上向き約 2.6 m/s、水平 約 1.8 m/s で離陸して、重心は約 0.35 m 上がり、約 0.52 秒で着地する。その間に水平に約 0.93 m 進む。</div>
+          <div class="dialog-bubble">だからこそ、どれだけ高く跳べるかは、離陸の瞬間にもう決まっている。いちばん高い所では上向きの速さが 0 になるから、その時刻と高さが計算できる。このチート900は、上向き約 2.6 m/s、水平 約 1.8 m/s で離陸して、重心は約 0.35 m 上がり、約 0.52 秒で着地する。その間に水平に約 0.93 m 進む。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">いちばん高くなる時刻：<span class="nw">v₀ − 9.8t ＝ 0</span> → <span class="nw">t ＝ v₀ ÷ 9.8</span></span>
+        <span class="step">上がる高さ：<span class="nw">v₀t − 4.9t² ＝ v₀² ÷ 9.8 − v₀² ÷ 19.6</span> <span class="nw">＝ v₀² ÷ (2 × 9.8)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -350,9 +375,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(6);</script>
 <script>
 /* ---------- 重心の計算（重さを変えられる） ---------- */

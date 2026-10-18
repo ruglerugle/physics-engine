@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018b">
+<link rel="stylesheet" href="design-system.css?v=20261018c">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -214,8 +214,13 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">それが内積のいちばん大事な性質だ。<br><strong>a・b ＝ |a| |b| cos θ</strong><br>逆に使えば、<strong>cos θ ＝ a・b ÷ (|a| |b|)</strong>。成分から内積と2つの長さを計算すれば、cos θ が分かる。cos θ から角度 θ に戻す計算は、関数電卓やコンピュータの arccos（アークコサイン）という機能がやってくれる。</div>
+          <div class="dialog-bubble">それが内積のいちばん大事な性質だ。逆に使えば、成分から内積と2つの長さを計算するだけで cos θ が分かる。cos θ から角度 θ に戻す計算は、関数電卓やコンピュータの arccos（アークコサイン）という機能がやってくれる。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">内積と角度：<span class="nw">a・b ＝ |a| |b| cos θ</span></span>
+        <span class="step">逆に使う：<span class="nw">cos θ ＝ a・b ÷ (|a| |b|)</span> → <span class="nw">θ ＝ arccos(cos θ)</span></span>
       </div>
 
       <div class="diagram-box">
@@ -285,15 +290,31 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">それが今日の2つ目の道具、<strong>外積</strong>だ。膝の角度が分かっても、<strong>膝がどちら向きに曲がっているか</strong>はまだ分からない。膝は蝶番（ちょうつがい）のように、決まった軸のまわりでしか曲がらない。その軸は、太ももとすねの<strong>両方に直角な向き</strong>だ。2本のベクトルの両方に直角な矢印を作る計算が外積で、記号は a×b と書く。<br><strong>a×b ＝ (a<sub>y</sub>b<sub>z</sub>−a<sub>z</sub>b<sub>y</sub>, a<sub>z</sub>b<sub>x</sub>−a<sub>x</sub>b<sub>z</sub>, a<sub>x</sub>b<sub>y</sub>−a<sub>y</sub>b<sub>x</sub>)</strong><br>内積と違って、答えはベクトルだ。</div>
+          <div class="dialog-bubble">それが今日の2つ目の道具、<strong>外積</strong>だ。膝の角度が分かっても、<strong>膝がどちら向きに曲がっているか</strong>はまだ分からない。膝は蝶番（ちょうつがい）のように、決まった軸のまわりでしか曲がらない。その軸は、太ももとすねの<strong>両方に直角な向き</strong>だ。2本のベクトルの両方に直角な矢印を作る計算が外積で、記号は a×b と書く。内積と違って、答えはベクトルだ。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">外積：<span class="nw">a×b ＝ (a<sub>y</sub>b<sub>z</sub> − a<sub>z</sub>b<sub>y</sub>,</span> <span class="nw">a<sub>z</sub>b<sub>x</sub> − a<sub>x</sub>b<sub>z</sub>,</span> <span class="nw">a<sub>x</sub>b<sub>y</sub> − a<sub>y</sub>b<sub>x</sub>)</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name student">うさ美</div>
           </div>
-          <div class="dialog-bubble">式が複雑です。本当に a にも b にも直角になるんですか？ さっきの a＝(1, 2, 0)、b＝(3, −1, 2) で試してみます。a×b ＝ (2×2−0×(−1), 0×3−1×2, 1×(−1)−2×3) ＝ (4, −2, −7)。a との内積は 4−4＋0＝0、b との内積は 12＋2−14＝0。両方 0 なので、どちらとも直角です。</div>
+          <div class="dialog-bubble">式が複雑です。本当に a にも b にも直角になるんですか？ さっきの a＝(1, 2, 0)、b＝(3, −1, 2) で a×b を計算して、a との内積と b との内積を確かめてみます。……どちらも 0 なので、両方と直角です。</div>
         </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">a×b：<span class="nw">(2×2 − 0×(−1),</span> <span class="nw">0×3 − 1×2,</span> <span class="nw">1×(−1) − 2×3)</span> <span class="nw">＝ (4, −2, −7)</span></span>
+        <span class="step">a との内積：<span class="nw">1×4 ＋ 2×(−2) ＋ 0×(−7) ＝ 0</span></span>
+        <span class="step">b との内積：<span class="nw">3×4 ＋ (−1)×(−2) ＋ 2×(−7) ＝ 0</span></span>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row">
           <div class="dialog-character">
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -406,9 +427,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018b"></script>
-<script src="js/motion.js?v=20261018b"></script>
-<script src="js/engine.js?v=20261018b"></script>
+<script src="js/progress.js?v=20261018c"></script>
+<script src="js/motion.js?v=20261018c"></script>
+<script src="js/engine.js?v=20261018c"></script>
 <script>RQ.initStagePage(2);</script>
 <script>
 /* ---------- シミュレータ1：内積（2D） ---------- */

@@ -232,6 +232,9 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .formula-box .step + .step{border-top:1px dashed #c4ddcd;padding-top:11px}
 /* 途中で割れると読めなくなる項だけ、折り返しを禁じる */
 .formula-box .nw{white-space:nowrap}
+/* 行列：左右に縦の括弧線を引いた数の表 */
+.formula-box .mat{display:inline-table;border-collapse:separate;border-spacing:0;vertical-align:middle;margin:3px 6px;border-left:2px solid #1c2a22;border-right:2px solid #1c2a22;border-radius:5px;text-indent:0}
+.formula-box .mat td{padding:0 8px;line-height:1.55;text-align:center;text-indent:0;white-space:nowrap}
 /* 幅の狭い画面では、見出しと式を別の行に分ける */
 .formula-box br.wbr{display:none}
 @media(max-width:480px){ .formula-box br.wbr{display:inline} }
