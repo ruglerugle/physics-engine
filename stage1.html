@@ -304,7 +304,14 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">速度を2つ並べて引いてごらん。後ろの速度は (p(k＋1)−p(k))×60、前の速度は (p(k)−p(k−1))×60。その差は (p(k＋1)−p(k)−p(k)＋p(k−1))×60＝(p(k＋1)−2p(k)＋p(k−1))×60。それをさらに60倍するから ×60² になる。p(k) が2回引かれるから「−2p(k)」なんだ。</div>
+          <div class="dialog-bubble">速度を2つ並べて引いてごらん。
+            <div class="formula-box">
+              <span class="step">後ろの速度：<span class="nw">(p(k＋1) − p(k)) × 60</span></span>
+              <span class="step">前の速度：<span class="nw">(p(k) − p(k−1)) × 60</span></span>
+              <span class="step">速度の差：<span class="nw">(p(k＋1) − p(k)</span> <span class="nw">− p(k) ＋ p(k−1)) × 60</span><br class="wbr"><span class="nw">＝ (p(k＋1) − 2p(k)</span> <span class="nw">＋ p(k−1)) × 60</span></span>
+              <span class="step">加速度 ＝ 速度の差 × 60：<span class="nw">(p(k＋1) − 2p(k)</span> <span class="nw">＋ p(k−1)) × 60²</span></span>
+            </div>
+            p(k) が2回引かれるから「−2p(k)」なんだ。</div>
         </div>
       </div>
 
