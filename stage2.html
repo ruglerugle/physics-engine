@@ -424,6 +424,60 @@
           </div>
           <div class="dialog-bubble">このアニメーションを作るとき、インパクトの瞬間に膝を伸ばし切る計算を、外積で求めた「膝の蝶番の軸」のまわりに、すねを回して行っていた。ところが脚がほぼ伸び切ったコマでは、その軸の向きが1コマおきに裏返ってしまい、<strong>つま先が1コマごとにジグザグに動く</strong>という不具合が出た。どう直したかはステージ5で話そう。今日の大事な点は、<strong>外積の向きは、外積が短いときには信用できない</strong>ということだ。</div>
         </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbitThink.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">内積も外積も、計算のしかたは分かりました。でも、それぞれが何を表しているのか、まだぴんと来ません。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">2本の矢印の関係を、<strong>そろっている分</strong>と<strong>ずれている分</strong>に分けて考えるといい。内積は、そろっている分だ。台車にロープをつけて斜めに引くと、台車を前へ進めるのに役立つのは、ロープの力のうち進む向きの分だけだね。その「効いている分」が内積で、b に真上から光を当てて a の上にできる<strong>影の長さに |a| を掛けたもの</strong>になる。同じ側を向けばプラス、直角なら 0、反対を向けばマイナスだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">では、外積がずれている分ですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだ。外積の長さはずれている分で、2本が作る<strong>平行四辺形の面積</strong>になる。まっすぐ並ぶと 0、直角でいちばん大きい。内積とちょうど逆だね。そして外積の向きは、<strong>a を b のほうへ回すときの回転の軸</strong>だ。スパナでボルトを回すとき、柄の向きを a、手で押す力を b とすると、a×b の向きがボルトの回る軸、長さが回す強さになる。柄と同じ向きに押しても、ボルトは回らない。押す向きを反対にすると、軸の向きも反対になってボルトは逆に回る。</div>
+        </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv3" role="img" aria-label="2本の矢印 a と b。b の角度と長さを変えると、b を a の上へ落とした影（内積）と、a と b の平行四辺形（外積の長さ）が変わる。右上の記号は外積の向き（画面の手前か奥か）"></canvas></div>
+        <div class="sim-controls">
+          <label>b の角度 θ <input type="range" id="th3" min="0" max="360" value="50" step="1"> <output id="th3o"></output></label>
+          <label>b の長さ |b| <input type="range" id="lb3" min="0.5" max="2" value="1.4" step="0.1"> <output id="lb3o"></output></label>
+        </div>
+        <div class="readout" id="ro3"></div>
+        <div class="diagram-caption">a の長さは 1.5 に固定。緑の太い線が b の影（長さ |b| cos θ）で、内積はこれに |a| を掛けたもの。紫の平行四辺形の面積が外積の長さ |a| |b| sin θ。右上の記号は外積 a×b の向きで、⊙ は画面の手前向き、⊗ は画面の奥向き。θ が 180° を越えると、a を b のほうへ回す向きが反対になり、外積の向きも裏返る</div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">そろっている分（内積）：<span class="nw">a・b ＝ |a| |b| cos θ</span></span>
+        <span class="step">ずれている分（外積の長さ）：<span class="nw">|a×b| ＝ |a| |b| sin θ</span></span>
+        <span class="step">2つを合わせると（cos²θ ＋ sin²θ ＝ 1 より）：<span class="nw">(a・b)² ＋ |a×b|² ＝ |a|² |b|²</span></span>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">膝の角度はそろい具合から、膝の蝶番の軸はずれ具合から出していたんですね。</div>
+        </div>
       </div>
 
       <div class="note-box"><span class="nb-title">💡 内積と外積の使い分け</span><strong>内積</strong>：答えは数。2本の間の角度（cos θ）や、ある向きへの影の長さ（成分）を知りたいときに使う。<br><strong>外積</strong>：答えはベクトル。2本の両方に直角な向き（回転の軸や、面の向き）と、2本が作る平行四辺形の面積（sin θ）を知りたいときに使う。2本がほぼ平行なときは向きが不安定になる。</div>
@@ -580,6 +634,40 @@
   var ft=k; PE.player(document.getElementById('play2'),function(dt){ft+=dt*PE.fps*0.25; if(ft>110)ft=40; el.set(Math.floor(ft));});
   el.addEventListener('input',function(){ft=parseFloat(el.value);});
   st.redraw();
+})();
+/* ---------- シミュレータ3：そろっている分（内積）とずれている分（外積） ---------- */
+(function(){
+  var th=50, lb=1.4, LA=1.5, st;
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W/4.2,H/4.3), O={x:W*0.4,y:H*0.5}, P=function(x,y){return {x:O.x+x*s,y:O.y-y*s};};
+    var t=PE.rad(th), bx=lb*Math.cos(t), by=lb*Math.sin(t), dot=LA*bx, cr=LA*by;
+    ctx.strokeStyle=PE.C.grid; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(10,O.y); ctx.lineTo(W-10,O.y); ctx.stroke();
+    /* 平行四辺形 */
+    var A=P(LA,0), B=P(bx,by), D=P(LA+bx,by);
+    ctx.fillStyle='rgba(122,79,176,.14)'; ctx.strokeStyle=PE.C.armL; ctx.setLineDash([4,4]); ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(O.x,O.y); ctx.lineTo(A.x,A.y); ctx.lineTo(D.x,D.y); ctx.lineTo(B.x,B.y); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+    if(Math.abs(cr)>0.05) PE.text(ctx,(O.x+A.x+D.x+B.x)/4,(O.y+A.y+D.y+B.y)/4,'面積 '+PE.fmt(Math.abs(cr),2),PE.C.armL,12,900);
+    /* 影 */
+    var F=P(bx,0), off=by>=0?14:-14;
+    ctx.strokeStyle=PE.C.muted; ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(F.x,F.y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=PE.C.ok; ctx.lineWidth=6; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(O.x,O.y+off); ctx.lineTo(F.x,F.y+off); ctx.stroke(); ctx.lineCap='butt';
+    PE.text(ctx,(O.x+F.x)/2,O.y+off*2.2,'影 '+PE.fmt(bx,2),PE.C.ok,12,900);
+    /* 矢印 */
+    PE.arrowPx(ctx,O.x,O.y,A.x,A.y,PE.C.legR,3.5,11); PE.text(ctx,A.x+10,A.y-10,'a',PE.C.legR,15,900,'left');
+    PE.arrowPx(ctx,O.x,O.y,B.x,B.y,PE.C.acc,3.5,11); PE.text(ctx,B.x+(bx>=0?10:-10),B.y+(by>=0?-10:14),'b',PE.C.acc,15,900,bx>=0?'left':'right');
+    /* 外積の向き */
+    var cx=W-40, cy=34; ctx.strokeStyle=PE.C.armL; ctx.lineWidth=1.8; ctx.beginPath(); ctx.arc(cx,cy,14,0,PE.TAU); ctx.stroke();
+    if(cr>0.05){ctx.fillStyle=PE.C.armL; ctx.beginPath(); ctx.arc(cx,cy,4,0,PE.TAU); ctx.fill();}
+    else if(cr<-0.05){ctx.beginPath(); ctx.moveTo(cx-9,cy-9); ctx.lineTo(cx+9,cy+9); ctx.moveTo(cx+9,cy-9); ctx.lineTo(cx-9,cy+9); ctx.stroke();}
+    PE.text(ctx,cx,cy+28,'a×b の向き',PE.C.muted,11,800); PE.text(ctx,cx,cy+43,cr>0.05?'手前':(cr<-0.05?'奥':'決まらない'),PE.C.armL,11.5,900);
+    var dl=Math.abs(dot)<0.05?'直角なので 0':(dot>0?'同じ側なのでプラス':'反対側なのでマイナス');
+    var cl=Math.abs(cr)<0.05?'まっすぐ並ぶので 0（向きが決まらない）':(th>80&&th<100||th>260&&th<280?'直角でいちばん大きい':'開くほど大きい');
+    document.getElementById('ro3').innerHTML='<span>内積 a・b ＝ |a| × 影 ＝ <b>'+PE.fmt(dot,2)+'</b>（'+dl+'）</span><span>外積の長さ |a×b| ＝ <b>'+PE.fmt(Math.abs(cr),2)+'</b>（'+cl+'）</span>';
+  }
+  st=PE.canvas('cv3',0.75,draw);
+  PE.bindRange('th3','th3o',function(v){return v+'°';},function(v){th=v;st.redraw();});
+  PE.bindRange('lb3','lb3o',function(v){return PE.fmt(v,1);},function(v){lb=v;st.redraw();});
 })();
 </script>
 </body>
