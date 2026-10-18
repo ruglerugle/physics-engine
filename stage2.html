@@ -166,6 +166,20 @@
         </div>
       </div>
 
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cv0" role="img" aria-label="3Dの座標軸の中に、右脚の股関節 H・膝 K・足首 A の点と座標を表示。原点から各点への矢印（位置）と、膝から股関節への矢印 a ＝ H − K、膝から足首への矢印 b ＝ A − K を描く。引く順番を逆にすると、矢印の向きが反対になる"></canvas></div>
+        <div class="sim-controls">
+          <label>コマ <input type="range" id="k0" min="0" max="161" value="20" step="1"> <output id="k0o"></output></label>
+          <button class="sim-play" id="play0" type="button" aria-pressed="false">▶ 再生</button>
+        </div>
+        <div class="sim-controls" id="ord0">
+          <button class="btn" type="button" data-o="1" aria-pressed="true">先の点 − 膝</button>
+          <button class="btn" type="button" data-o="-1" aria-pressed="false">膝 − 先の点（逆の順番）</button>
+        </div>
+        <div class="readout" id="ro0"></div>
+        <div class="diagram-caption">床の上の原点 O から x（赤）・y（緑）・z（青）の軸を伸ばした3Dの座標。灰色の点線は原点から各点への矢印（その点の座標そのもの）。赤い矢印 a と b は、先の点の座標から膝の座標を引いて作った矢印で、膝から出ている。「逆の順番」にすると、同じ長さで向きが反対の矢印（−a と −b）になり、股関節や足首を指さなくなる。図はドラッグで回せる</div>
+      </div>
+
       <div class="formula-box">
         <span class="step">膝から股関節への矢印：<span class="nw">a ＝ (股関節の座標) − (膝の座標) ＝ (a<sub>x</sub>, a<sub>y</sub>, a<sub>z</sub>)</span></span>
         <span class="step">膝から足首への矢印：<span class="nw">b ＝ (足首の座標) − (膝の座標) ＝ (b<sub>x</sub>, b<sub>y</sub>, b<sub>z</sub>)</span></span>
@@ -480,6 +494,46 @@
   PE.bindRange('th1','th1o',function(v){return v+'°';},function(v){th=v;st.redraw();});
   PE.bindRange('rot1','rot1o',function(v){return v+'°';},function(v){rot=v;st.redraw();});
   PE.bindRange('lb1','lb1o',function(v){return PE.fmt(v,1);},function(v){lb=v;st.redraw();});
+})();
+
+/* ---------- 3Dグラフ：座標の引き算で矢印を作る ---------- */
+(function(){
+  var k=20, ord=1, st, cam, O=[0,0,0];
+  function v3(v){return '('+v.map(function(x){return PE.fmt(x,2);}).join(', ')+')';}
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var p=PE.pose(k), Kp=p.kneeR, Hp=p.hipR, Ap=p.ankleR;
+    cam.target=PE.mul(PE.add(O,Kp),0.5); cam.target[1]=Math.max(0.5,cam.target[1]);
+    PE.floor(ctx,cam,Math.min(-0.5,Kp[0]-1),Math.max(0.5,Kp[0]+1),-1,1,0.25);
+    PE.axes(ctx,cam,O,0.6);
+    PE.text(ctx,cam.proj(O).x-10,cam.proj(O).y+12,'O',PE.C.ink,12,900,'right');
+    PE.drawBody(ctx,cam,p,{alpha:0.18,thin:true});
+    /* 原点から各点への矢印（位置） */
+    ctx.setLineDash([4,4]);
+    [Hp,Kp,Ap].forEach(function(e){var a=cam.proj(O), b=cam.proj(e); PE.arrowPx(ctx,a.x,a.y,b.x,b.y,'#8f877b',1.6,8);});
+    ctx.setLineDash([]);
+    var a=PE.mul(PE.sub(Hp,Kp),ord), b=PE.mul(PE.sub(Ap,Kp),ord);
+    var K=cam.proj(Kp), Ha=cam.proj(PE.add(Kp,a)), Ab=cam.proj(PE.add(Kp,b));
+    var ca=ord>0?PE.C.legR:'#8f877b', cb=ord>0?'#e07a5f':'#b9b0a3';
+    PE.arrowPx(ctx,K.x,K.y,Ha.x,Ha.y,ca,4,11); PE.arrowPx(ctx,K.x,K.y,Ab.x,Ab.y,cb,4,11);
+    PE.text(ctx,(K.x+Ha.x)/2+(Ha.y<K.y?-12:12),(K.y+Ha.y)/2,(ord>0?'a':'−a'),ca,16,900,Ha.y<K.y?'right':'left'); PE.text(ctx,(K.x+Ab.x)/2+(Ab.y<K.y?-12:12),(K.y+Ab.y)/2,(ord>0?'b':'−b'),cb,16,900,Ab.y<K.y?'right':'left');
+    /* 点の名前と座標は、3点の真ん中から外へ向けて置く */
+    var Hq=cam.proj(Hp), Aq=cam.proj(Ap), mx=(Hq.x+K.x+Aq.x)/3, my=(Hq.y+K.y+Aq.y)/3;
+    [[Hp,Hq,'H 股関節'],[Kp,K,'K 膝'],[Ap,Aq,'A 足首']].forEach(function(e){var q=e[1], dx=q.x-mx, dy=q.y-my, l=Math.hypot(dx,dy)||1;
+      ctx.fillStyle=PE.C.ink; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,PE.TAU); ctx.fill();
+      var tx=q.x+dx/l*14, ty=q.y+dy/l*14+(dy>0?6:-4), al=dx>=0?'left':'right';
+      PE.text(ctx,tx,ty,e[2],PE.C.ink,12,900,al); PE.text(ctx,tx,ty+14,v3(e[0]),PE.C.muted,11,800,al);});
+    PE.text(ctx,10,16,'t = '+PE.fmt(k/PE.fps,3)+' 秒（コマ '+k+'）',PE.C.ink,12,900,'left');
+    var lab=ord>0?['a ＝ H − K','b ＝ A − K']:['K − H（逆）','K − A（逆）'];
+    document.getElementById('ro0').innerHTML='<span>'+lab[0]+' ＝ '+v3(ord>0?Hp:Kp)+' − '+v3(ord>0?Kp:Hp)+' ＝ <b>'+v3(a)+'</b></span><span>'+lab[1]+' ＝ '+v3(ord>0?Ap:Kp)+' − '+v3(ord>0?Kp:Ap)+' ＝ <b>'+v3(b)+'</b></span><span>内積 '+(ord>0?'a・b':'')+' ＝ <b>'+PE.fmt(PE.dot(a,b),3)+'</b></span>';
+  }
+  st=PE.canvas('cv0',0.8,function(s){if(cam)draw(s);});
+  cam=PE.camera(st,{yaw:-35,pitch:16,dist:3,target:[0,0.5,0],scale:1.25});
+  var el=PE.bindRange('k0','k0o',function(v){return PE.fmt(v/PE.fps,2)+' 秒';},function(v){k=v;st.redraw();});
+  var ft=k; PE.player(document.getElementById('play0'),function(dt){ft=(ft+dt*PE.fps*0.4)%PE.N; el.set(Math.floor(ft));});
+  el.addEventListener('input',function(){ft=parseFloat(el.value);});
+  document.querySelectorAll('#ord0 .btn').forEach(function(btn){btn.addEventListener('click',function(){ord=+btn.getAttribute('data-o'); document.querySelectorAll('#ord0 .btn').forEach(function(x){x.setAttribute('aria-pressed',x===btn?'true':'false');}); st.redraw();});});
+  st.redraw();
 })();
 
 /* ---------- シミュレータ2：右脚の膝の角度（内積）と曲がる軸（外積） ---------- */
