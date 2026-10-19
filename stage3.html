@@ -155,7 +155,58 @@
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name student">うさ美</div>
           </div>
-          <div class="dialog-bubble">『<a href="https://complex-number.habatakijuku.com/" target="_blank" rel="noopener" style="color:#2f7a55;text-decoration:underline">本当はおもしろい複素数の世界</a>』で、点 (x, y) を複素数 x＋yi と見て、cos φ＋i sin φ を掛けると φ だけ回る、と習いました。掛け算を展開すると、i²＝−1 なので回した点が出ます。</div>
+          <div class="dialog-bubble">『<a href="https://complex-number.habatakijuku.com/" target="_blank" rel="noopener" style="color:#2f7a55;text-decoration:underline">本当はおもしろい複素数の世界</a>』で、複素数の掛け算は回転だと習いました。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そうだね。今日の話の土台になるから、順におさらいしよう。複素数と平面の点は、どう結びついていたかな？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">2乗すると −1 になる数を i と書いて、<span class="nw">x＋yi</span> の形の数を複素数といいます。x を横の座標、y を縦の座標と見れば、複素数 <span class="nw">x＋yi</span> は平面の点 (x, y) と1つずつ対応します。この数に i を掛けると、点 (x, y) は (−y, x) へ移ります。1 → i → −1 → −i と、原点のまわりに 90° ずつ回っていきます。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">i を掛ける：<span class="nw">(x ＋ yi) × i ＝ xi ＋ yi²</span></span>
+        <span class="step">i² ＝ −1 を使う：<span class="nw">＝ −y ＋ xi</span>　→ 点は <span class="nw">(x, y) から (−y, x) へ</span></span>
+        <span class="step">1 から始めると：<span class="nw">1 → i → −1 → −i → 1</span>（点では <span class="nw">(1, 0) → (0, 1) → (−1, 0) → (0, −1)</span>）</span>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">90° 以外の角度は、どう考えたんだった？</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">複素数を、原点からの<strong>長さ</strong>と、x 軸から反時計回りに測った<strong>角度</strong>の2つで見ます。2つの複素数を掛けると、答えの長さは2つの長さの掛け算、答えの角度は2つの角度の足し算になる。i は長さ1・角度 90° なので、掛けると長さはそのままで 90° 回る、ということでした。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。そして、長さ1で角度 φ の複素数が <strong>cos φ ＋ i sin φ</strong> だ。cos φ と sin φ は、原点を中心とする半径1の円の上を、(1, 0) から反時計回りに角度 φ だけ進んだ点の横と縦の座標のことだからね。これを掛けると、長さは1倍で変わらず、角度だけが φ 増える。つまり点は φ だけ回る。実際に掛けて、回した点の座標を出してごらん。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">展開して、i² ＝ −1 を使えば出ます。</div>
         </div>
       </div>
 
@@ -171,7 +222,7 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">よく覚えていたね。同じ式を、3次元にも広げられる別の見方で出し直そう。x の向きの長さ1の矢印 e<sub>x</sub>＝(1, 0) と、y の向きの e<sub>y</sub>＝(0, 1) を用意する。どんな点も、(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub>、つまり「e<sub>x</sub> の向きに x 歩、e<sub>y</sub> の向きに y 歩」と書ける。図形を丸ごと回すと、この「歩き方」はそのままで、2本の矢印だけが回る。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。</div>
+          <div class="dialog-bubble">これで、点 (x, y) を φ 回した先が出た。同じ式を、3次元にも広げられる別の見方で出し直そう。x の向きの長さ1の矢印 e<sub>x</sub>＝(1, 0) と、y の向きの e<sub>y</sub>＝(0, 1) を用意する。どんな点も、(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub>、つまり「e<sub>x</sub> の向きに x 歩、e<sub>y</sub> の向きに y 歩」と書ける。図形を丸ごと回すと、この「歩き方」はそのままで、2本の矢印だけが回る。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。</div>
         </div>
         <div class="dialog-row right">
           <div class="dialog-character">
