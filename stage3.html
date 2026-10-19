@@ -185,7 +185,46 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">その通り。そして、長さ1で角度 φ の複素数が <strong>cos φ ＋ i sin φ</strong> だ。cos φ と sin φ は、原点を中心とする半径1の円の上を、(1, 0) から反時計回りに角度 φ だけ進んだ点の横と縦の座標のことだからね。これを掛けると、長さは1倍で変わらず、角度だけが φ 増える。つまり点は φ だけ回る。実際に掛けて、回した点の座標を出してごらん。</div>
+          <div class="dialog-bubble">その通り。では、長さ1で角度 φ の複素数は、どう書けばいいかな。そのために cos と sin を使ったね。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">原点から角度 φ の方角へ長さ1の矢印を引いたとき、その先端の横の位置が <strong>cos φ</strong>、縦の位置が <strong>sin φ</strong> でした。つまり、原点を中心とする半径1の円の上で、(1, 0) から反時計回りに角度 φ だけ進んだ点が (cos φ, sin φ) です。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。0° や 90° のように点の位置がすぐ分かる角度なら、値もすぐ読める。60° のように図形から求められる角度もあるし、そうでない角度は電卓やコンピュータが計算してくれる。それから、半径1の円の上の点だから、三平方の定理でどの角度でも <span class="nw">(cos φ)² ＋ (sin φ)² ＝ 1</span> が成り立つ。</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <span class="step">φ ＝ 0°：点は真横の (1, 0)　→ <span class="nw">cos 0° ＝ 1、</span><span class="nw">sin 0° ＝ 0</span></span>
+        <span class="step">φ ＝ 90°：点は真上の (0, 1)　→ <span class="nw">cos 90° ＝ 0、</span><span class="nw">sin 90° ＝ 1</span></span>
+        <span class="step">φ ＝ 60°：原点・(1, 0)・60° の点を結ぶと正三角形。半分に折ると横は 1/2　→ <span class="nw">cos 60° ＝ 1/2</span></span>
+        <span class="step">縦は三平方の定理から：<span class="nw">1² ＝ (1/2)² ＋ y²</span> <span class="nw">→ y² ＝ 3/4</span> <span class="nw">→ sin 60° ＝ √3/2 ≒ 0.866</span></span>
+        <span class="step">どの角度でも：<span class="nw">(cos φ)² ＋ (sin φ)² ＝ 1</span>（半径1の円の上の点だから）</span>
+      </div>
+
+      <div class="dialogue-scene">
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">ということは、点 (cos φ, sin φ) を複素数にした <strong>cos φ ＋ i sin φ</strong> が、長さ1・角度 φ の複素数ですね。これを掛けると、長さは1倍で変わらず、角度だけが φ 増える。点は φ だけ回る、ということですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。実際に掛けて、回した点の座標を出してごらん。</div>
         </div>
         <div class="dialog-row right">
           <div class="dialog-character">
