@@ -72,7 +72,7 @@
   ]
 }
 </script>
-<link rel="stylesheet" href="design-system.css?v=20261018c">
+<link rel="stylesheet" href="design-system.css?v=20261024a">
 <style>
   .sim-controls{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;justify-content:center;margin-top:10px}
   .sim-controls .btn{font-size:12.5px;padding:.45rem .8rem}
@@ -256,7 +256,35 @@
             <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
             <div class="dialog-name mentor">ねこ博士</div>
           </div>
-          <div class="dialog-bubble">これで、点 (x, y) を φ 回した先が出た。同じ式を、3次元にも広げられる別の見方で出し直そう。x の向きの長さ1の矢印 e<sub>x</sub>＝(1, 0) と、y の向きの e<sub>y</sub>＝(0, 1) を用意する。どんな点も、(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub>、つまり「e<sub>x</sub> の向きに x 歩、e<sub>y</sub> の向きに y 歩」と書ける。図形を丸ごと回すと、この「歩き方」はそのままで、2本の矢印だけが回る。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。</div>
+          <div class="dialog-bubble">これで、点 (x, y) を φ 回した先が出た。同じ答えを、別の考え方でも出してみよう。こちらは3次元にもそのまま使える。まず、長さ1の矢印を2本用意する。右向きの <span class="nw">e<sub>x</sub>＝(1, 0)</span> と、上向きの <span class="nw">e<sub>y</sub>＝(0, 1)</span> だ。たとえば点 (2, 1) へは、原点から e<sub>x</sub> を2本つないで右へ2進み、続けて e<sub>y</sub> を1本つないで上へ1進めば着く。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">点 (x, y) なら、e<sub>x</sub> を x 本、e<sub>y</sub> を y 本つなげば着きますね。式で書くと <span class="nw">(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub></span>（e<sub>x</sub> を x 倍した矢印と、e<sub>y</sub> を y 倍した矢印の足し算）です。</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">そう。ここで、方眼紙を原点のところでピンで留めて、紙ごと φ 回すことを考えよう。紙に描いた点も、2本の矢印も、一緒に回る。でも紙の上で見れば、点は「e<sub>x</sub> を2本、e<sub>y</sub> を1本」の場所にあるままだ。変わったのは、2本の矢印の向きだけなんだ。</div>
+        </div>
+        <div class="dialog-row right">
+          <div class="dialog-character">
+            <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name student">うさ美</div>
+          </div>
+          <div class="dialog-bubble">紙の上での位置は変わらないから、回した点へは、<strong>回った</strong> e<sub>x</sub> を x 本、<strong>回った</strong> e<sub>y</sub> を y 本つなげば着く、ということですか？</div>
+        </div>
+        <div class="dialog-row">
+          <div class="dialog-character">
+            <div class="dialog-avatar mentor"><img src="images/cat.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
+            <div class="dialog-name mentor">ねこ博士</div>
+          </div>
+          <div class="dialog-bubble">その通り。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。あとは、回った2本の矢印がどちらを向くかが分かれば計算できる。</div>
         </div>
       </div>
 
@@ -499,9 +527,9 @@
   </div>
 </div>
 
-<script src="js/progress.js?v=20261018c"></script>
-<script src="js/motion.js?v=20261018c"></script>
-<script src="js/engine.js?v=20261018c"></script>
+<script src="js/progress.js?v=20261024a"></script>
+<script src="js/motion.js?v=20261024a"></script>
+<script src="js/engine.js?v=20261024a"></script>
 <script>RQ.initStagePage(3);</script>
 <script>
 /* ---------- 共通：ロドリゲスの回転 ---------- */
