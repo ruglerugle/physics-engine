@@ -258,6 +258,20 @@
           </div>
           <div class="dialog-bubble">これで、点 (x, y) を φ 回した先が出た。同じ式を、3次元にも広げられる別の見方で出し直そう。x の向きの長さ1の矢印 e<sub>x</sub>＝(1, 0) と、y の向きの e<sub>y</sub>＝(0, 1) を用意する。どんな点も、(x, y) ＝ x e<sub>x</sub> ＋ y e<sub>y</sub>、つまり「e<sub>x</sub> の向きに x 歩、e<sub>y</sub> の向きに y 歩」と書ける。図形を丸ごと回すと、この「歩き方」はそのままで、2本の矢印だけが回る。だから回した点は <strong>x×（回った e<sub>x</sub>）＋ y×（回った e<sub>y</sub>）</strong>だ。</div>
         </div>
+      </div>
+
+      <div class="diagram-box">
+        <div class="cv-wrap"><canvas id="cvW" role="img" aria-label="点 (x, y) へ、x の向きの矢印を x 歩、y の向きの矢印を y 歩つないで行く。方眼ごと φ 回すと、歩数はそのままで矢印の向きだけが変わり、同じ歩き方で回した点に着く"></canvas></div>
+        <div class="sim-controls">
+          <label>角度 φ <input type="range" id="phW" min="-180" max="180" value="35" step="1"> <output id="phWo"></output></label>
+          <label>x <input type="range" id="xW" min="-3" max="3" value="2" step="1"> <output id="xWo"></output></label>
+          <label>y <input type="range" id="yW" min="-3" max="3" value="1" step="1"> <output id="yWo"></output></label>
+        </div>
+        <div class="readout" id="roW"></div>
+        <div class="diagram-caption">うすい色が回す前：点 (x, y) へは、原点から赤の矢印 e<sub>x</sub>＝(1, 0) を x 本、続けて緑の矢印 e<sub>y</sub>＝(0, 1) を y 本つないで行ける。こい色が φ 回したあと：方眼も矢印も一緒に回るが、「赤を x 本、緑を y 本」という歩き方は変わらない。だから同じ歩き方で、回した点に着く（x や y がマイナスなら、その本数だけ逆向きにつなぐ）。金色の点線は、点 (x, y) が原点のまわりに φ 回った道すじ</div>
+      </div>
+
+      <div class="dialogue-scene">
         <div class="dialog-row right">
           <div class="dialog-character">
             <div class="dialog-avatar student"><img src="images/rabbit.webp" width="300" height="386" alt="" loading="lazy" decoding="async"></div>
@@ -528,6 +542,53 @@ function rotPose(p,center,k,th){ var o={}; for(var n in p) o[n]=PE.add(center,ro
   }
   st=PE.canvas('cv0',0.8,draw);
   PE.bindRange('ph0','ph0o',function(v){return v+'°';},function(v){ph=v;st.redraw();});
+})();
+
+/* ---------- シミュレータW：歩き方はそのままで、矢印だけが回る ---------- */
+(function(){
+  var ph=35, nx=2, ny=1, st;
+  function draw(st){
+    var ctx=st.ctx, W=st.W, H=st.H; ctx.clearRect(0,0,W,H); ctx.fillStyle=PE.C.paper; ctx.fillRect(0,0,W,H);
+    var s=Math.min(W,H)/2/Math.max(3.2,Math.hypot(nx,ny)+0.7), O={x:W*0.5,y:H*0.5}, f=PE.rad(ph), c=Math.cos(f), si=Math.sin(f);
+    var P=function(x,y){return {x:O.x+x*s,y:O.y-y*s};};
+    var ex=[c,si], ey=[-si,c];
+    function line(a,b,col,w,dash){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(dash||[]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);}
+    // 回す前の方眼（うすい灰色）と、回した方眼（うすい金色）
+    for(var i=-9;i<=9;i++){ line(P(i,-9),P(i,9),PE.C.grid,1); line(P(-9,i),P(9,i),PE.C.grid,1); }
+    ctx.globalAlpha=0.28;
+    for(var j=-9;j<=9;j++){
+      line(P(j*ex[0]-9*ey[0], j*ex[1]-9*ey[1]), P(j*ex[0]+9*ey[0], j*ex[1]+9*ey[1]), PE.C.gold, 1);
+      line(P(j*ey[0]-9*ex[0], j*ey[1]-9*ex[1]), P(j*ey[0]+9*ex[0], j*ey[1]+9*ex[1]), PE.C.gold, 1);
+    }
+    ctx.globalAlpha=1;
+    // 歩き方：e1 を nx 本、続けて e2 を ny 本つなぐ
+    function walk(e1,e2,alpha,label){
+      ctx.globalAlpha=alpha; var p=[0,0], i, q, A, B, sx=nx<0?-1:1, sy=ny<0?-1:1;
+      for(i=0;i<Math.abs(nx);i++){ q=[p[0]+sx*e1[0],p[1]+sx*e1[1]]; A=P(p[0],p[1]); B=P(q[0],q[1]); PE.arrowPx(ctx,A.x,A.y,B.x,B.y,PE.C.x,3.5,10); if(label&&i===0) PE.text(ctx,(A.x+B.x)/2-13*e1[1]*sx,(A.y+B.y)/2-13*e1[0]*sx+4,'eₓ',PE.C.x,12.5,900); p=q; }
+      for(i=0;i<Math.abs(ny);i++){ q=[p[0]+sy*e2[0],p[1]+sy*e2[1]]; A=P(p[0],p[1]); B=P(q[0],q[1]); PE.arrowPx(ctx,A.x,A.y,B.x,B.y,PE.C.y,3.5,10); if(label&&i===0) PE.text(ctx,(A.x+B.x)/2+13*e2[1]*sy,(A.y+B.y)/2+13*e2[0]*sy+4,'eᵧ',PE.C.y,12.5,900); p=q; }
+      ctx.globalAlpha=1; return p;
+    }
+    var p0=walk([1,0],[0,1],0.28,false);
+    var p1=walk(ex,ey,1,true);
+    // 点 (x, y) が原点のまわりに φ 回る道すじ
+    var r=Math.hypot(p0[0],p0[1]), a0=Math.atan2(p0[1],p0[0]);
+    if(r>0.01 && Math.abs(f)>0.01){ ctx.strokeStyle=PE.C.gold; ctx.lineWidth=1.6; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.arc(O.x,O.y,r*s,-a0,-(a0+f),f>0); ctx.stroke(); ctx.setLineDash([]); }
+    var Q0=P(p0[0],p0[1]), Q1=P(p1[0],p1[1]);
+    ctx.fillStyle=PE.C.muted; ctx.beginPath(); ctx.arc(Q0.x,Q0.y,5,0,PE.TAU); ctx.fill();
+    ctx.fillStyle=PE.C.com; ctx.beginPath(); ctx.arc(Q1.x,Q1.y,6.5,0,PE.TAU); ctx.fill();
+    ctx.fillStyle=PE.C.ink; ctx.beginPath(); ctx.arc(O.x,O.y,3.5,0,PE.TAU); ctx.fill();
+    function tag(Q,str,col){ ctx.font='900 12px sans-serif'; var tw=ctx.measureText(str).width+6, lx=Math.min(Math.max(Q.x+9,4),W-tw); PE.text(ctx,lx,Math.max(Q.y-9,14),str,col,12,900,'left'); }
+    tag(Q0,'(x, y) ＝ ('+nx+', '+ny+')',PE.C.muted);
+    tag(Q1,'回した点',PE.C.com);
+    function cnt(col,n){return col+(n<0?'を逆向きに '+(-n):'を '+n)+' 本';}
+    PE.text(ctx,10,16,cnt('赤',nx)+'、'+cnt('緑',ny),PE.C.ink,12,900,'left');
+    var X=nx*c+ny*(-si), Y=nx*si+ny*c;
+    document.getElementById('roW').innerHTML='<span>回った eₓ ＝ (<b>'+PE.fmt(c,3)+'</b>, <b>'+PE.fmt(si,3)+'</b>)　回った eᵧ ＝ (<b>'+PE.fmt(-si,3)+'</b>, <b>'+PE.fmt(c,3)+'</b>)</span><span>回した点 ＝ '+nx+'×（回った eₓ）＋ '+ny+'×（回った eᵧ）＝ (<b>'+PE.fmt(X,3)+'</b>, <b>'+PE.fmt(Y,3)+'</b>)</span>';
+  }
+  st=PE.canvas('cvW',0.8,draw);
+  PE.bindRange('phW','phWo',function(v){return v+'°';},function(v){ph=v;st.redraw();});
+  PE.bindRange('xW','xWo',function(v){return v+' 歩';},function(v){nx=v;st.redraw();});
+  PE.bindRange('yW','yWo',function(v){return v+' 歩';},function(v){ny=v;st.redraw();});
 })();
 
 /* ---------- シミュレータ1：平面の回転行列 ---------- */
